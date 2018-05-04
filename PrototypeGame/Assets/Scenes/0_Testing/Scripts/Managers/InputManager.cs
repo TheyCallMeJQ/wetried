@@ -9,8 +9,6 @@ public class InputManager : MonoBehaviour {
 	private const string INPUT_AXIS_HORIZONTAL = "Horizontal";
 	private const string INPUT_AXIS_VERTICAL = "Vertical";
 
-	/**The speed at which the player moves*/
-	public float m_Speed;
 	/**The button we'll use for movement (I'm not sure which button we want to use, so I'll set it to a default and facilitate testing for later)*/
 	public int m_MouseButton = 0;
 
@@ -25,7 +23,7 @@ public class InputManager : MonoBehaviour {
 	{
 		float horizontal_input = Input.GetAxisRaw (INPUT_AXIS_HORIZONTAL);
 		float vertical_input = Input.GetAxisRaw (INPUT_AXIS_VERTICAL);
-		this.m_PlayerContainer.GetComponent<PlayerMovement> ().MovePlayer (horizontal_input, vertical_input, this.m_Speed);
+		this.m_PlayerContainer.GetComponent<PlayerMovement> ().SetMovementFromInput (horizontal_input, vertical_input);
 	}
 
 	/**A function to take care of processing player movement input, where the player moves to the point clicked*/

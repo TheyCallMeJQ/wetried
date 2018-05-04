@@ -156,6 +156,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PlayerMovementFlag_Prefab: {fileID: 1271327648028652, guid: 787db0f5bcafa4036b7ade97f2898d59,
     type: 2}
+  m_Speed: 5
 --- !u!1 &95256790
 GameObject:
   m_ObjectHideFlags: 0
@@ -226,7 +227,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_PlayerContainer: {fileID: 46964559}
-  m_Speed: 5
   m_MouseButton: 0
 --- !u!1 &828533735
 GameObject:
