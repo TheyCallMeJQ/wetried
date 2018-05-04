@@ -3,36 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour {
-	/**Object corresponding to player.*/
-	[SerializeField] private GameObject m_PlayerGameObj;
+	/**Object corresponding to player container.*/
+	[SerializeField] private GameObject m_PlayerContainer;
 
 	private const string INPUT_AXIS_HORIZONTAL = "Horizontal";
 	private const string INPUT_AXIS_VERTICAL = "Vertical";
 
-	public float m_Speed = 1.0f;
+	/**The speed at which the player moves*/
+	public float m_Speed;
+	/**The button we'll use for movement (I'm not sure which button we want to use, so I'll set it to a default and facilitate testing for later)*/
+	public int m_MouseButton = 0;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
 	// Update is called once per frame
 	void Update () {
-		this.MovePlayer ();
+//		this.ProcessPlayerMovementInput_Keyboard();
+		this.ProcessPlayerMovementInput_MouseClick();
 	}
 
-	private void MovePlayer()
+	/**A function to take care of processing player movement input, where the classic WASD/arrow keys control movement.*/
+	private void ProcessPlayerMovementInput_Keyboard()
 	{
-		Vector3 movement = new Vector3();
 		float horizontal_input = Input.GetAxisRaw (INPUT_AXIS_HORIZONTAL);
 		float vertical_input = Input.GetAxisRaw (INPUT_AXIS_VERTICAL);
+		this.m_PlayerContainer.GetComponent<PlayerMovement> ().MovePlayer (horizontal_input, vertical_input, this.m_Speed);
+	}
 
-		if (horizontal_input != 0.0f || vertical_input != 0.0f) {
-			movement += new Vector3 (horizontal_input * m_Speed, 0.0f, vertical_input * m_Speed);
-			if (movement.magnitude > m_Speed) {
-				movement = Vector3.Normalize (movement) * m_Speed;
-			}
-			this.m_PlayerGameObj.GetComponent<PlayerMovement> ().Move (movement);
+	/**A function to take care of processing player movement input, where the player moves to the point clicked*/
+	private void ProcessPlayerMovementInput_MouseClick()
+	{
+		if (Input.GetMouseButtonDown (this.m_MouseButton)) {
+			this.m_PlayerContainer.GetComponent<PlayerMovement> ().CreatePlayerMovementFlag();
 		}
 	}
+
 }
