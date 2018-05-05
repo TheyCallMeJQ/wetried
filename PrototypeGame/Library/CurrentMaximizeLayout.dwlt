@@ -20,10 +20,10 @@ MonoBehaviour:
     y: 30
     width: 1309
     height: 616
-  m_MinSize: {x: 679, y: 492}
-  m_MaxSize: {x: 14002, y: 14042}
+  m_MinSize: {x: 681, y: 492}
+  m_MaxSize: {x: 14004, y: 14042}
   vertical: 0
-  controlID: 9727
+  controlID: 9973
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_MinSize: {x: 404, y: 492}
   m_MaxSize: {x: 10002, y: 14042}
   vertical: 1
-  controlID: 9728
+  controlID: 9974
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_MinSize: {x: 404, y: 221}
   m_MaxSize: {x: 8004, y: 4021}
   vertical: 0
-  controlID: 9729
+  controlID: 9975
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -203,8 +203,8 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
+    m_SelectedIDs: 4ebfffff
+    m_LastClickedID: -16562
     m_ExpandedIDs: b28cfefffe8effff5a9bffff4ebfffffdaf7ffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -316,9 +316,9 @@ MonoBehaviour:
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 0, y: 0.5, z: 0}
+    m_Target: {x: -0.6171157, y: 0.5, z: -0.7793882}
     speed: 2
-    m_Value: {x: 0, y: 0.5, z: 0}
+    m_Value: {x: -0.6171157, y: 0.5, z: -0.7793882}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -342,9 +342,9 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.17502962, y: 0.6940354, z: -0.1800354, w: 0.6747384}
+    m_Target: {x: 0.19601198, y: -0.03235331, z: 0.0064707203, w: 0.980047}
     speed: 2
-    m_Value: {x: 0.17502962, y: 0.69403535, z: -0.1800354, w: 0.6747384}
+    m_Value: {x: 0.19601184, y: -0.03235329, z: 0.0064707156, w: 0.9800463}
   m_Size:
     m_Target: 10.3249
     speed: 2
@@ -574,18 +574,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/Scenes/0_Testing/AnimatorControllers
+    - Assets/Scenes/0_Testing/Scripts/Helpers
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Scenes/0_Testing/AnimatorControllers
+  - Assets/Scenes/0_Testing/Scripts/Helpers
   m_LastFoldersGridSize: 16
   m_LastProjectPath: /Users/Jacques/Desktop/Unity Projects/Melina_Game/wetried/PrototypeGame
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 02400000
-    m_LastClickedID: 16386
+    scrollPos: {x: 0, y: 58}
+    m_SelectedIDs: 00460000
+    m_LastClickedID: 17920
     m_ExpandedIDs: cc2a0000722b00007e2b0000842b00000a330000303f00006440000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -639,8 +639,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
+    m_SelectedInstanceIDs: 4ebfffff
+    m_LastClickedInstanceID: -16562
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000c4400000742600004c2600006cd7ffff5c2600000e3100006033000096260000544600005846000018b8faff7af0f7ff463100000e290000742e00007a270000ba2700007c26000022280000982a0000c8320000302a0000e63d02006e2a00000a270000122b0000142b0000fed3f5ffa0270000c24a01001e2e00003c270000482800001c390000f23f0000b62a0000a82d00009a280000fc280000ae280000c028000010290000ea28000086280000d42800009c27000062270000c42700007627000088270000d8270000b22700004e270000000000004c390000f4400000a0280000924000008e2b0000c637fbff
     m_RenameOverlay:
@@ -658,7 +658,7 @@ MonoBehaviour:
       m_IsRenaming: 0
       m_OriginalEventType: 11
       m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 0}
+      m_ClientGUIView: {fileID: 11}
     m_CreateAssetUtility:
       m_EndAction: {fileID: 0}
       m_InstanceID: 0
@@ -668,7 +668,7 @@ MonoBehaviour:
     m_NewAssetIndexInList: -1
     m_ScrollPosition: {x: 0, y: 0}
     m_GridSize: 16
-  m_DirectoriesAreaWidth: 110
+  m_DirectoriesAreaWidth: 196
 --- !u!114 &16
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -687,8 +687,8 @@ MonoBehaviour:
     y: 0
     width: 398
     height: 616
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 277, y: 71}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
