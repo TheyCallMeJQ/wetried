@@ -1,5 +1,5 @@
 ﻿/*
-* A script to be attached as a component to the player gameobject to facilitate movement.
+* A script to be attached as a component to the player container gameobject to facilitate movement.
 */
 
 using System.Collections;
@@ -12,17 +12,33 @@ public class PlayerMovement : MonoBehaviour {
 	[SerializeField] private GameObject m_PlayerMovementFlag_Prefab;
 	private GameObject m_PlayerMovementFlag_Instance = null;
 
-	/**The movement vector being applied to the player gameobject*/
+	/**The movement vector being applied to the player gameobject, defined in global coordinates*/
 	private Vector3 m_Movement = Vector3.zero;
 
 	/**The speed at which the player moves*/
 	public float m_Speed;
 
+	private Animator m_PlayerMovementAnimator;
+
+	private const string ANIMATOR_PARAM_ISMOVING_LEFT = "isMovingLeft";
+	private const string ANIMATOR_PARAM_ISMOVING_RIGHT = "isMovingRight";
+	private const string ANIMATOR_PARAM_ISMOVING_UP = "isMovingUp";
+	private const string ANIMATOR_PARAM_ISMOVING_DOWN = "isMovingDown";
+
+	[SerializeField] private Camera m_Camera;
+
+	void Awake()
+	{
+		this.m_PlayerMovementAnimator = this.GetComponentInChildren<Animator> ();
+	}
+
 	void Update()
 	{
 		this.ApplyMovement();
+		this.UpdateAnimator ();
 	}
 
+	/**A function to actually apply the movement to the player gameobject, context-depending.*/
 	private void ApplyMovement()
 	{
 		//If the flag exists (this implies that the player just clicked to initiate movement)
@@ -50,6 +66,16 @@ public class PlayerMovement : MonoBehaviour {
 		if (this.m_Movement != Vector3.zero) {
 			this.transform.position += this.m_Movement;
 		}
+	}
+
+	/**A function to update the player animator, with respect to the movement input (specifically, with respect to [this.m_Movement]*/
+	private void UpdateAnimator()
+	{
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_LEFT, this.m_Movement.x < 0.0f);
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_RIGHT, this.m_Movement.x > 0.0f);
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_UP, this.m_Movement.z > 0.0f);
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_DOWN, this.m_Movement.z < 0.0f);
+		//Note: Idle behavior is defined as an absence of any motion
 	}
 
 	/**
@@ -121,5 +147,7 @@ public class PlayerMovement : MonoBehaviour {
 		//else the vector was fine to begin with
 		return vector;
 	}
+
+
 
 }
