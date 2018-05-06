@@ -794,5 +794,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Floor: {fileID: 2087449572}
-  m_GridBoxesPerFloorX: 10
-  m_GridBoxesPerFloorZ: 10
+  m_GridBox_Prefab: {fileID: 1578983373090010, guid: d777c59e007b3449fb37b5ed906bdb7c,
+    type: 2}
+  m_GridBoxesPerFloorX: 3
+  m_GridBoxesPerFloorZ: 5
