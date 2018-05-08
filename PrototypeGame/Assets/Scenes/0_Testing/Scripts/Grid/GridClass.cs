@@ -39,11 +39,6 @@ public class GridClass : MonoBehaviour {
 		this.m_StartingPosition = new Vector3 (start_x, start_y, start_z);
 	}
 
-	void Start()
-	{
-		this.InitializeGrid ();
-	}
-
 	#if TESTING_GRID_FUNCTIONALITIES
 	/**A tester function; will draw what the grid should resemble, in Editor mode only.
 	*Should only be uncommented for testing.*/
@@ -70,6 +65,11 @@ public class GridClass : MonoBehaviour {
 			}
 		}
 
+	}
+	#else
+	void Start()
+	{
+		this.InitializeGrid ();
 	}
 	#endif
 
