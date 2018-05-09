@@ -5,13 +5,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GridBox : MonoBehaviour {
-
+	private int m_Index = -1;
 	private enum NEIGHBOR_POSITIONS {TOP = 0, RIGHT = 1, BOTTOM = 2, LEFT = 3};
 	private List<int> m_NeighborIndices = new List<int>();
 
 	/**A function to assign a single grid box its respective neighbors, taking into account its index and the number of boxes per row and column, respectively*/
 	public void InitializeNeighbors(int box_index, int boxes_per_row, int boxes_per_column)
 	{
+		this.m_Index = box_index;
+
 		//if the box is simultaneously in all corners
 		if (this.BoxIsInTopLeftCorner (box_index, boxes_per_row) && this.BoxIsInTopRightCorner (box_index, boxes_per_row)
 		    && this.BoxIsInBottomLeftCorner (box_index, boxes_per_row, boxes_per_column) && this.BoxIsInBottomRightCorner (box_index, boxes_per_row, boxes_per_column)) 
@@ -185,5 +187,10 @@ public class GridBox : MonoBehaviour {
 			message += neighbor_names[index] + ": " + this.m_NeighborIndices [index] + " ";
 		}
 		Debug.Log (message);
+	}
+
+	public int GetBoxIndex()
+	{
+		return this.m_Index;
 	}
 }

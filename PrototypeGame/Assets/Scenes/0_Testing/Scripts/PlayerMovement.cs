@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour {
 
 	/**The speed at which the player moves*/
 	public float m_Speed;
+	/**The radius of the movement flag planted where the player needs to go; the smaller this is, the closer to the center of a gridbox the player will move*/
+	public float m_MovementFlagInstanceRadius = 0.01f;
 
 	private Animator m_PlayerMovementAnimator;
 
@@ -25,7 +27,11 @@ public class PlayerMovement : MonoBehaviour {
 	private const string ANIMATOR_PARAM_ISMOVING_UP = "isMovingUp";
 	private const string ANIMATOR_PARAM_ISMOVING_DOWN = "isMovingDown";
 
-	[SerializeField] private Camera m_Camera;
+	/**The index of the Gridbox currently occupied by the player
+	 * Note that while the player is moving, this quantity will reflect the grid box they are moving to. 
+	 * This quantity is public mostly for testing.
+	*/
+	public int m_GridBoxCurrentIndex = -1;
 
 	void Awake()
 	{
@@ -54,7 +60,6 @@ public class PlayerMovement : MonoBehaviour {
 			if (flag_to_player.magnitude > this.m_PlayerMovementFlag_Prefab.GetComponent<SphereCollider>().radius) {
 				flag_to_player.Normalize ();
 				flag_to_player *= this.m_Speed * Time.fixedDeltaTime;
-				//				this.transform.position += new Vector3(flag_to_player.x, 0.0f, flag_to_player.y);
 				this.m_Movement = new Vector3(flag_to_player.x, 0.0f, flag_to_player.y);
 			}
 			else
@@ -89,11 +94,16 @@ public class PlayerMovement : MonoBehaviour {
 		//Create a flag where we clicked
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		foreach (RaycastHit hit in Physics.RaycastAll(ray)) {
-			if (hit.collider.gameObject.layer == LayerMask.NameToLayer ("Floor")) {
-				Vector3 point_of_impact = hit.point;
+			GridBox grid_box = hit.collider.gameObject.GetComponent<GridBox> ();
+			if (grid_box != null) {
 				this.m_PlayerMovementFlag_Instance = GameObject.Instantiate (this.m_PlayerMovementFlag_Prefab);
-				this.m_PlayerMovementFlag_Instance.transform.position = point_of_impact;
-			}//end if
+				this.m_PlayerMovementFlag_Instance.transform.GetComponent<SphereCollider> ().radius = this.m_MovementFlagInstanceRadius;
+				//There is no vertical component to the movement, 
+				//so we don't need to worry about the height of the flag with respect to the grid box
+				this.m_PlayerMovementFlag_Instance.transform.position = grid_box.transform.position;
+
+				this.m_GridBoxCurrentIndex = grid_box.GetBoxIndex ();
+			}
 		}//end foreach
 	}
 
