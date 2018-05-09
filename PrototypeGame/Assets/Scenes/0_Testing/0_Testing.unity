@@ -159,7 +159,8 @@ MonoBehaviour:
   m_PlayerMovementFlag_Prefab: {fileID: 1271327648028652, guid: 787db0f5bcafa4036b7ade97f2898d59,
     type: 2}
   m_Speed: 5
-  m_Camera: {fileID: 0}
+  m_MovementFlagInstanceRadius: 0.1
+  m_GridBoxCurrentIndex: -1
 --- !u!1 &95256790
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,5 +797,5 @@ MonoBehaviour:
   m_Floor: {fileID: 2087449572}
   m_GridBox_Prefab: {fileID: 1578983373090010, guid: d777c59e007b3449fb37b5ed906bdb7c,
     type: 2}
-  m_GridBoxesPerFloorX: 2
-  m_GridBoxesPerFloorZ: 1
+  m_GridBoxesPerFloorX: 10
+  m_GridBoxesPerFloorZ: 10

@@ -1,5 +1,5 @@
 ﻿//#define TESTING_GRID_FUNCTIONALITIES
-#define TESTING_NEIGHBOR_ASSIGNMENT
+//#define TESTING_NEIGHBOR_ASSIGNMENT
 
 using System.Collections;
 using System.Collections.Generic;
@@ -86,6 +86,7 @@ public class GridClass : MonoBehaviour {
 			Vector3 adjustment_vertical = this.m_StartingPosition - new Vector3 (0.0f, 0.0f, this.m_GridBoxSize.z * row);
 			for (int column = 0; column < this.m_GridBoxesPerFloorX; column++) {
 				GameObject gridbox = GameObject.Instantiate (this.m_GridBox_Prefab, grid_hierarchy_container.transform);
+				gridbox.name = "Gridbox_" + box_index;
 				Vector3 adjustment_horizontal = new Vector3 (column * this.m_GridBoxSize.x, 0.0f, 0.0f);
 				gridbox.transform.position = adjustment_horizontal + adjustment_vertical;
 				gridbox.transform.localScale = this.m_GridBoxSize;
