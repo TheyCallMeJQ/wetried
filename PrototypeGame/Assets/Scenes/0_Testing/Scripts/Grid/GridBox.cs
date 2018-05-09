@@ -8,10 +8,77 @@ public class GridBox : MonoBehaviour {
 	private int m_Index = -1;
 	private enum NEIGHBOR_POSITIONS {TOP = 0, RIGHT = 1, BOTTOM = 2, LEFT = 3};
 	private List<int> m_NeighborIndices = new List<int>();
+	/**A value to tell us whether or not there's something that would potentially inhibit movement at this gridbox.*/
+	public bool m_IsObstructed = false;
+
+	public float m_HeightOfObstructionCheck = 30.0f;
+
+	/**A function to have the gridbox check whether or not it is obstructed by anything.
+	* Note: we count anything under the "Obstructable" layer as being something that can obstruct the gridbox.
+	* If a gridbox is obstructed, the player can't walk there.
+	*/
+	public void VerifyObstructionStatus()
+	{
+		float boxgrid_width_half = this.transform.lossyScale.x / 2.0f;
+		float boxgrid_depth_half = this.transform.lossyScale.z / 2.0f;
+
+		for (int corner = 0; corner < 4; corner++) {
+			Vector3 origin = this.transform.position - new Vector3(0.0f, 0.1f, 0.0f);
+			switch (corner) {
+			//Top right corner
+			case 0:
+				{
+					origin += new Vector3 (boxgrid_width_half, 0.0f, boxgrid_depth_half);
+					break;
+				}
+			//Top left corner
+			case 1:
+				{
+					origin += new Vector3 (-boxgrid_width_half, 0.0f, boxgrid_depth_half);
+					break;
+				}
+			//Bottom left corner
+			case 2:
+				{
+					origin += new Vector3 (boxgrid_width_half, 0.0f, -boxgrid_depth_half);
+					break;
+				}
+			//Bottom right corner
+			case 3:
+				{
+					origin += new Vector3 (-boxgrid_width_half, 0.0f, -boxgrid_depth_half);
+					break;
+				}
+			default:
+				{
+					Debug.Log ("Error in GridBox::VerifyObstructionStatus() switch - default case");
+					//impossible
+					break;
+				}
+			}//end switch
+
+//			Debug.Log("box " + this.m_Index + " origin: " + origin.x + ", " + origin.y + ", " + origin.z);
+
+			foreach(RaycastHit hit in Physics.RaycastAll(origin, Vector3.up, this.m_HeightOfObstructionCheck))
+			{
+				if (hit.collider.gameObject.layer == UnityEngine.LayerMask.NameToLayer("Obstructable")) {
+//					Debug.Log ("Obstructable detected");
+					this.m_IsObstructed = true;
+					return;
+				}
+			}
+		}
+	}
+
+	public bool IsGridBoxObstructed()
+	{
+		return this.m_IsObstructed;
+	}
 
 	/**A function to assign a single grid box its respective neighbors, taking into account its index and the number of boxes per row and column, respectively*/
 	public void InitializeNeighbors(int box_index, int boxes_per_row, int boxes_per_column)
 	{
+		//While we're here, with the information we're given, initialize the box's index.
 		this.m_Index = box_index;
 
 		//if the box is simultaneously in all corners
@@ -192,5 +259,10 @@ public class GridBox : MonoBehaviour {
 	public int GetBoxIndex()
 	{
 		return this.m_Index;
+	}
+
+	public List<int> GetNeighborIndices()
+	{
+		return this.m_NeighborIndices;
 	}
 }
