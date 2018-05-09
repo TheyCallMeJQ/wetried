@@ -95,7 +95,8 @@ public class PlayerMovement : MonoBehaviour {
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		foreach (RaycastHit hit in Physics.RaycastAll(ray)) {
 			GridBox grid_box = hit.collider.gameObject.GetComponent<GridBox> ();
-			if (grid_box != null) {
+			//If what was clicked was an unobstructed gridbox...
+			if (grid_box != null && !grid_box.IsGridBoxObstructed()) {
 				this.m_PlayerMovementFlag_Instance = GameObject.Instantiate (this.m_PlayerMovementFlag_Prefab);
 				this.m_PlayerMovementFlag_Instance.transform.GetComponent<SphereCollider> ().radius = this.m_MovementFlagInstanceRadius;
 				//There is no vertical component to the movement, 

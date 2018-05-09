@@ -93,6 +93,7 @@ public class GridClass : MonoBehaviour {
 
 				GridBox box = gridbox.GetComponent<GridBox> ();
 				box.InitializeNeighbors (box_index++, this.m_GridBoxesPerFloorX, this.m_GridBoxesPerFloorZ);
+				box.VerifyObstructionStatus ();
 				this.m_Grid.Add (box);
 			}
 		}//end for
