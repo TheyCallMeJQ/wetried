@@ -1,0 +1,19 @@
+Devlog - Jacques
+mm/dd/yyyy
+
+05/12/2018
+- Division of application of movement to better espouse notion of acceleration. In specific, splitting up the application of motion into three specific phases:
+    - The beginning of motion (from rest to a given velocity)
+        - This is straight-forward; we just progressively increase the current velocity by the acceleration (ensuring we don't surpass the terminal velocity).
+    - The sustaining of the motion (increasing velocity by acceleration, up until we reach a terminal velocity)
+    - The ending of motion (coming from any given velocity to rest at the center of the gridbox our movement is mapped to)
+        - We should have access to the following information when this phase is triggered:
+            - Distance until we come to rest
+            - Time in which we want to come to rest, once within the given distance
+            - Current velocity
+        So from that, we can find the deceleration (the constant rate at which to decrease the velocity such that we come to rest at the given point) by triggering a FindDeceleration() function once we come to within a given distance until we come to rest. Specifically, we have deceleration formula
+            D = (Vf - Vi) / t, such that
+        D = Deceleration
+        Vf = final velocity (0)
+        Vi = current velocity
+        t = time it takes to come to rest

@@ -18,13 +18,13 @@ public class InputManager : MonoBehaviour {
 		this.ProcessPlayerMovementInput_MouseClick();
 	}
 
-	/**A function to take care of processing player movement input, where the classic WASD/arrow keys control movement.*/
-	private void ProcessPlayerMovementInput_Keyboard()
-	{
-		float horizontal_input = Input.GetAxisRaw (INPUT_AXIS_HORIZONTAL);
-		float vertical_input = Input.GetAxisRaw (INPUT_AXIS_VERTICAL);
-		this.m_PlayerContainer.GetComponent<PlayerMovement> ().SetMovementFromInput (horizontal_input, vertical_input);
-	}
+//	/**A function to take care of processing player movement input, where the classic WASD/arrow keys control movement.*/
+//	private void ProcessPlayerMovementInput_Keyboard()
+//	{
+//		float horizontal_input = Input.GetAxisRaw (INPUT_AXIS_HORIZONTAL);
+//		float vertical_input = Input.GetAxisRaw (INPUT_AXIS_VERTICAL);
+//		this.m_PlayerContainer.GetComponent<PlayerMovement> ().SetMovementFromInput (horizontal_input, vertical_input);
+//	}
 
 	/**A function to take care of processing player movement input, where the player moves to the point clicked*/
 	private void ProcessPlayerMovementInput_MouseClick()
