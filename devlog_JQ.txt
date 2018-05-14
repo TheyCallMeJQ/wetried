@@ -17,3 +17,7 @@ mm/dd/yyyy
         Vf = final velocity (0)
         Vi = current velocity
         t = time it takes to come to rest
+        
+05/14/2018
+I was wrong about the acceleration; we can split it into two phases, when we want to accelerate, and when we want to decelerate.
+The deceleration itself is defined with respect to a new velocity value that we find based on the distance from the edge of the movement flag prefab's radius as well as the time in which we want to come to a stop. Fixed some minor bugs with the flag, too. We were able to make our velocity progressively greater by quickly spawning the flag multiple times or by spawning the flag, waiting for velocity to accumulate, and then clicking a wall.
