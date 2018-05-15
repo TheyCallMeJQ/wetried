@@ -158,9 +158,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PlayerMovementFlag_Prefab: {fileID: 1271327648028652, guid: 787db0f5bcafa4036b7ade97f2898d59,
     type: 2}
+  m_Floors:
+  - {fileID: 2087449577}
   m_TerminalVelocity: 1
   m_Acceleration: 0.5
   m_TimeTillRest: 0.2
+  m_CurrentVelocity: 0
   m_GridBoxCurrentIndex: -1
 --- !u!1 &95256790
 GameObject:
