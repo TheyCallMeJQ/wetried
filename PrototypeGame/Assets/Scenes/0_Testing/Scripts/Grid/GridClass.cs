@@ -1,5 +1,6 @@
 ﻿//#define TESTING_GRID_FUNCTIONALITIES
 //#define TESTING_NEIGHBOR_ASSIGNMENT
+#define TESTING_FINDING_OBSTRUCTED_GRIDBOXES
 
 using System.Collections;
 using System.Collections.Generic;
@@ -103,5 +104,113 @@ public class GridClass : MonoBehaviour {
 			this.m_Grid [index].PrintNeighbors (index);
 		}
 		#endif
+	}//end f'n InitializeGrid()
+
+	/**A function intended to be called from the PlayerMovement class - finds and returns the path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
+	public List<GridBox> FindPath(int index_from, int index_to)
+	{
+		this.CheckGridBoxesAndAssignDistances (index_to);
+
+		List<GridBox> path = new List<GridBox> ();
+		return path;
+
+	}
+
+	public bool ObstructableAlongTrajectory(int current_index, int target_index)
+	{
+		if (current_index == target_index) {
+			return false;
+		}
+
+		//We want to find the "area" within the indices that we want to examine.
+		int row_count = 0, column_count = 0;
+
+		int current_index_column = current_index % this.m_GridBoxesPerFloorX;
+		int target_index_column = target_index % this.m_GridBoxesPerFloorX;
+		column_count = current_index_column - target_index_column;
+
+		int current_index_row = current_index / this.m_GridBoxesPerFloorX;
+		int target_index_row = target_index / this.m_GridBoxesPerFloorX;
+		row_count = current_index_row - target_index_row;
+
+		#if TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+		string message = "";
+		message += "Current index: " + current_index + "; [" + current_index_row + ", " + current_index_column + "]\n";
+		message += "Target index: " + target_index + "; [" + target_index_row + ", " + target_index_column + "]\n";
+		message += "Indices under investigation:\n";
+		#endif
+		/*
+		 * from the above, we can conclude:
+		 * - if row count < 0, then we're moving "downwards" in the grid; target_row > current_row
+		 * - if row count == 0, then we're not moving "vertically" in the grid; target_row == current_row
+		 * - if row count > 0, then we're moving "upwards" in the grid; target_row < current_row
+		 * - if column count < 0, then we're moving "rightwards" in the grid; target_column > current_column
+		 * - if column count == 0, then we're not moving "horizontally" in the grid; target_column == current_column
+		 * - if column count > 0, then we're moving "leftwards" in the grid; target_column < current_column
+		 */
+
+		int row_negative = row_count > 0 ? -1 : 1;
+		int column_negative = column_count > 0 ? -1 : 1;
+
+		for (int row = 0; row < Mathf.Abs (row_count); row++) {
+			for (int column = 0; column < Mathf.Abs (column_count); column++) {
+				int index_under_investigation = current_index + (column * column_negative) + (this.m_GridBoxesPerFloorX * row * row_negative);
+				//For first click, we have player gridbox index mapped to -1
+				if (index_under_investigation < 0) {
+					#if TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+					Debug.Log ("Negative index");
+					#endif
+					return false;
+				}
+				#if TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+				message += " " + index_under_investigation;
+				#endif
+				bool gridbox_obstructed = this.m_Grid[index_under_investigation].IsGridBoxObstructed();
+				if (gridbox_obstructed) {
+					#if TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+					message += "\nGridbox " + index_under_investigation + " found to be obstructed - returning true";
+					Debug.Log (message);
+					#endif
+					return true;
+				}
+			}//end for
+			#if TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+			message += "\n";
+			#endif
+		}
+		#if TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+		Debug.Log (message);
+		#endif
+		//if we make it this far, then none of the grid boxes were obstructed
+		return false;
+	}
+
+	/**A recursive function to go through all the movement flag's neighboring slots and assign them an integer distance from the flag.
+	*The pathfinding algorithm will use these distances to choose the nearest path to the flag.*/
+	private void CheckGridBoxesAndAssignDistances(int index)
+	{
+		int distance = 0;
+		this.m_Grid[index].SetGridboxDistanceFromFlag(distance);
+		distance++;
+		List<int> neighboring_indices = this.m_Grid [index].GetNeighborIndices ();
+
+		foreach (int neighbor in neighboring_indices) {
+			if (neighbor > -1) {
+				this.m_Grid [neighbor].SetGridboxDistanceFromFlag (distance);
+			}
+		}
+		foreach (int neighbor in neighboring_indices) {
+			if (neighbor > -1) {
+				this.CheckGridBoxesAndAssignDistances (neighbor);
+			}
+		}
+	}
+
+	/**A function to reset the grid after each pathfinding search*/
+	private void ResetGridCheckedStatus()
+	{
+		foreach (GridBox box in this.m_Grid) {
+			box.ResetGridboxDistanceFromFlag();
+		}
 	}
 }

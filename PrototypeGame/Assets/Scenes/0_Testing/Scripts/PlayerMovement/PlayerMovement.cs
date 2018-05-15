@@ -12,8 +12,10 @@ public class PlayerMovement : MonoBehaviour {
 	[SerializeField] private GameObject m_PlayerMovementFlag_Prefab;
 	private GameObject m_PlayerMovementFlag_Instance = null;
 
-	/**The movement vector being applied to the player gameobject, defined in global coordinates*/
-//	private Vector3 m_Movement = Vector3.zero;
+	/**A list of GridClass objects, containing the grids for all our floors. This may legit be how we need to do it. 
+	 * I've not begun to think about floor crossing into other floors, but I know that'll come sooner or later.*/
+	[SerializeField] private List<GridClass> m_Floors;
+
 	/**The direction in which the player is moving.*/
 	private Vector3 m_DirectionOfMotion = Vector3.zero;
 
@@ -48,7 +50,6 @@ public class PlayerMovement : MonoBehaviour {
 	void Awake()
 	{
 		this.m_PlayerMovementAnimator = this.GetComponentInChildren<Animator> ();
-//		this.m_MovementFlagInstanceRadius = this.m_PlayerMovementFlag_Prefab.GetComponent<SphereCollider> ().radius;
 	}
 
 	void Update()
@@ -210,6 +211,7 @@ public class PlayerMovement : MonoBehaviour {
 			RemovePlayerMovementFlag ();
 			this.m_CurrentVelocity /= 10.0f;
 		}
+		bool obstructable_along_trajectory = false;
 		//Create a flag where we clicked
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 		foreach (RaycastHit hit in Physics.RaycastAll(ray)) {
@@ -222,10 +224,29 @@ public class PlayerMovement : MonoBehaviour {
 				this.m_PlayerMovementFlag_Instance.transform.position = grid_box.transform.position;
 				//Update direction of motion
 				this.FindAndNormalizeDirectionOfMotion();
+
+				obstructable_along_trajectory = this.m_Floors[0].ObstructableAlongTrajectory(this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex());
+
 				//Update the index of the current grid box we're occupying
 				this.m_GridBoxCurrentIndex = grid_box.GetBoxIndex ();
 			}
 		}//end foreach
+
+		//First and foremost, we need a reference to the GridClass class. We should try and get that in Start(), or Awake(), if possible.
+		//Though I'd rather avoid having to feed the floor into this... there may not be another way, that I can see. 
+		//We'll see what happens.
+		if (obstructable_along_trajectory) {
+			//...trigger pathfinding
+		}
+
+		//But we should obviously only be doing the bit about finding the path if our current trajectory leads through an obstructable.
+		//I'm worried about shooting a ray to determine whether or not there's an obstructable ahead. It might be safer to devise a way
+		//to use the gridboxes to our advantage in this, as they contain the obstructed information anyway, so that would be fool-proof.
+	}
+
+	private bool DirectionOfMotionWouldLeadThroughObstructable()
+	{
+		return false;
 	}
 
 	private void RemovePlayerMovementFlag()

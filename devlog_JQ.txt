@@ -18,6 +18,34 @@ mm/dd/yyyy
         Vi = current velocity
         t = time it takes to come to rest
         
-05/14/2018
+05/14/2018 - (> Midnight)
 I was wrong about the acceleration; we can split it into two phases, when we want to accelerate, and when we want to decelerate.
 The deceleration itself is defined with respect to a new velocity value that we find based on the distance from the edge of the movement flag prefab's radius as well as the time in which we want to come to a stop. Fixed some minor bugs with the flag, too. We were able to make our velocity progressively greater by quickly spawning the flag multiple times or by spawning the flag, waiting for velocity to accumulate, and then clicking a wall.
+
+05/14/2018
+Right, today is the beginning of pathfinding.
+Pseudocode for pathfinding algorithm follows:
+- m_Path = new List<GridBoxes>() //Do we want this in PlayerMovement or GridClass? Probably PlayerMovement.
+
+Add the following to the end of the CreatePlayerMovementFlag() function
+    if player_to_flag leads through an onstructable (later improvement: or leads to gridboxes that are obstructed)
+        then m_Path = GridClass::FindPath(int index_from, int index_to);
+        //set it up such that we're consistently moving towards m_Path[0], and when we reach that point, we remove that entry from the list
+        //It might be easier to do this for m_path.length - 1; whichever works best, it's the same basic concept.
+    else 
+        then just move normally immediately to the given point
+        //maybe just add the point as m_Path[0] or m_Path[length - 1], depending on what we choose, for consistency
+
+It might help to have a definition for the final point we're moving to (our destination) being something like
+    if (m_Path.size == 1)
+        then we're moving to the destination, or final point in our path
+        
+And for FindPath(int index_from, int index_to)
+    //At this point we know that our destination lies beyond an obstructable
+    From the destination gridbox, recursively search the neighborhood such that we establish each respective gridbox's distance from the target.
+    //the target has distance 0
+        for every gridbox neighbor
+            mark the neighbor as checked and assign it distance += 1
+        then check that gridbox's neighbors in turn
+    //Note order is significant here. We first check all immediate neighbors, then search the subtrees one at a time    
+    

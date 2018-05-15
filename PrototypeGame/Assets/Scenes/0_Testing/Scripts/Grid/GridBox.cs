@@ -1,4 +1,9 @@
-﻿//#define TESTING_NEIGHBOR_INDICES
+﻿/*
+* Honestly, the entirety of this class belongs within the GridClass class. 
+* But if we do that, then we can't attach this script to the prefab instance, so ignore me.
+*/
+
+//#define TESTING_NEIGHBOR_INDICES
 
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +17,10 @@ public class GridBox : MonoBehaviour {
 	public bool m_IsObstructed = false;
 
 	public float m_HeightOfObstructionCheck = 30.0f;
+
+	/**An int value representing the distance from the target the player is moving to, along the defined neighbors, and excluding passage through obstructed gridboxes.
+	*NOTE: Should be private in final rendition.*/
+	public int m_DistanceFromDestination = -1;
 
 	/**A function to have the gridbox check whether or not it is obstructed by anything.
 	* Note: we count anything under the "Obstructable" layer as being something that can obstruct the gridbox.
@@ -264,5 +273,27 @@ public class GridBox : MonoBehaviour {
 	public List<int> GetNeighborIndices()
 	{
 		return this.m_NeighborIndices;
+	}
+
+//	public bool SetGridboxHasBeenCheckedForPathfinding(bool status)
+//	{
+//		this.m_HasBeenCheckedForPathfinding = status;
+//	}
+
+	public void SetGridboxDistanceFromFlag(int distance)
+	{
+		this.m_DistanceFromDestination = 0;
+	}
+
+	/**A function to be called on each gridbox in our resetting of the grid after each successful pathfinding*/
+	public void ResetGridboxDistanceFromFlag()
+	{
+		this.m_DistanceFromDestination = -1;
+	}
+
+	/**A function to tell us whether or not we've already checked the given slot in our search for the best path to take to reach the destination*/
+	public bool GridboxHasBeenCheckedForPathfinding()
+	{
+		return this.m_DistanceFromDestination != -1;
 	}
 }
