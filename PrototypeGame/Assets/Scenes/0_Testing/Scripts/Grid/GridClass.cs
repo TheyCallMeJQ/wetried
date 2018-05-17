@@ -25,6 +25,11 @@ public class GridClass : MonoBehaviour {
 	/**Grid boxes desired along floor "height"; to be set from the Inspector
 	*This quantity is effectively the number of grid boxes per column.*/
 	public int m_GridBoxesPerFloorZ;
+	/**An int value to represent the current distance from the flag for the neighbors whose indices are in the neighbor list.*/
+	private int m_CurrentDistanceFromFlag = 0;
+	/**A list containing all neighbors up for pathfinding inspection.
+	*Note: this property should be private in the final iteration.*/
+	public List<int> m_NeighborList = new List<int> ();
 
 	void Awake()
 	{
@@ -112,9 +117,37 @@ public class GridClass : MonoBehaviour {
 		this.CheckGridBoxesAndAssignDistances (index_to);
 
 		List<GridBox> path = new List<GridBox> ();
-		return path;
 
+		return path;
 	}
+
+//	private List<int> RecursiveIterateToFindSmallestNeighbors(int start_index)
+//	{
+//		if (this.m_Grid [start_index].GetGridboxDistanceFromFlag () != 0) {
+//			this.FindIndexOfSmallestNeighbor
+//			//by now we have the smallest
+//
+//		} else {
+//			return 
+//		}
+//
+//	}
+//
+//	private int FindIndexOfSmallestNeighbor(int start_index)
+//	{
+//		//placeholder, until we actually find the smallest value
+//		int index_of_smallest = start_index;
+//		foreach (int neighbor in this.m_Grid[start_index].GetNeighborIndices()) {
+//			if (neighbor > -1) {
+//				//if there exists a neighbor with distance smaller than the smallest, it becomes the new smallest
+//				int neighbor_distance = this.m_Grid [neighbor].GetGridboxDistanceFromFlag ();
+//				if (neighbor_distance < this.m_Grid [index_of_smallest].GetGridboxDistanceFromFlag ()) {
+//					index_of_smallest = neighbor;
+//				}
+//			}
+//		}
+//		return index_of_smallest;
+//	}
 
 	public bool ObstructableAlongTrajectory(int current_index, int target_index)
 	{
@@ -189,22 +222,72 @@ public class GridClass : MonoBehaviour {
 	*The pathfinding algorithm will use these distances to choose the nearest path to the flag.*/
 	private void CheckGridBoxesAndAssignDistances(int index)
 	{
-		int distance = 0;
-		this.m_Grid[index].SetGridboxDistanceFromFlag(distance);
-		distance++;
-		List<int> neighboring_indices = this.m_Grid [index].GetNeighborIndices ();
+		if (index > -1){
+			//First check the current index
+			GridBox grid_box = this.m_Grid [index];
+			//if this is the first grid box we check...
+			if (this.m_CurrentDistanceFromFlag == 0) {
+				//...then set the distance for the flag box to 0 and increment the distance value
+				grid_box.SetGridboxDistanceFromFlag (this.m_CurrentDistanceFromFlag++);
 
-		foreach (int neighbor in neighboring_indices) {
-			if (neighbor > -1) {
-				this.m_Grid [neighbor].SetGridboxDistanceFromFlag (distance);
+				foreach (int neighboring_index in grid_box.GetNeighborIndices()) {
+					if (this.GridBoxIsValidForPathfinding (neighboring_index)) {
+						this.m_NeighborList.Add (neighboring_index);
+					}
+				}
 			}
+
+			this.ExhaustNeighbors ();
 		}
-		foreach (int neighbor in neighboring_indices) {
-			if (neighbor > -1) {
-				this.CheckGridBoxesAndAssignDistances (neighbor);
+
+	}
+
+	/**A function to recursively exhaust all neighbors found during the pathfinding setup*/
+	private void ExhaustNeighbors()
+	{
+		if (this.m_NeighborList.Count > 0) {
+
+			List<int> temp_neighbor_list = new List<int> ();
+			foreach (int neighbor in this.m_NeighborList) {
+				if (neighbor > -1) {
+					foreach (int neighbor_neighbor in this.m_Grid[neighbor].GetNeighborIndices()) {
+						if (this.GridBoxIsValidForPathfinding(neighbor_neighbor))
+						{
+							temp_neighbor_list.Add (neighbor_neighbor);
+						}
+					}
+					this.m_Grid [neighbor].SetGridboxDistanceFromFlag (this.m_CurrentDistanceFromFlag);
+				}
 			}
+
+			this.m_CurrentDistanceFromFlag++;
+
+			this.m_NeighborList.Clear ();
+			foreach (int neighbor in temp_neighbor_list) {
+				this.m_NeighborList.Add (neighbor);
+			}
+
+			this.ExhaustNeighbors ();
+		}
+
+	}
+
+	/**A function to ensure a gridbox can be used for pathfinding.
+	*Specifically, ensures that the gridbox has a proper positive index value, that the gridbox isn't obstructed, and that the gridbox hasn't yet been checked for pathfinding.
+	*Note: If a gridbox has been assigned a distance from the flag gridbox, we say of it that it has been checked for pathfinding.*/
+	private bool GridBoxIsValidForPathfinding(int gridbox_index)
+	{
+		bool grid_box_exists = (gridbox_index != -1);
+		if (!grid_box_exists) {
+//			Debug.Log ("grid box doesn't exist");
+			return false;
+		} else {
+			GridBox grid_box = this.m_Grid [gridbox_index];
+//			Debug.Log ("grid box is not obstructed: " + !grid_box.IsGridBoxObstructed () + " grid box has not been checked for pathfinding: " + !grid_box.GridboxHasBeenCheckedForPathfinding ());
+			return !grid_box.IsGridBoxObstructed () && !grid_box.GridboxHasBeenCheckedForPathfinding ();
 		}
 	}
+
 
 	/**A function to reset the grid after each pathfinding search*/
 	private void ResetGridCheckedStatus()
@@ -212,5 +295,7 @@ public class GridClass : MonoBehaviour {
 		foreach (GridBox box in this.m_Grid) {
 			box.ResetGridboxDistanceFromFlag();
 		}
+		this.m_CurrentDistanceFromFlag = 0;
+		this.m_NeighborList.Clear ();
 	}
 }

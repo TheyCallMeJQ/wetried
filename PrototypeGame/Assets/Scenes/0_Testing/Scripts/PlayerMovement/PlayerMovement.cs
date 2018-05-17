@@ -226,6 +226,9 @@ public class PlayerMovement : MonoBehaviour {
 				this.FindAndNormalizeDirectionOfMotion();
 
 				obstructable_along_trajectory = this.m_Floors[0].ObstructableAlongTrajectory(this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex());
+				if (obstructable_along_trajectory) {
+					this.m_Floors [0].FindPath (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
+				}
 
 				//Update the index of the current grid box we're occupying
 				this.m_GridBoxCurrentIndex = grid_box.GetBoxIndex ();
@@ -235,9 +238,10 @@ public class PlayerMovement : MonoBehaviour {
 		//First and foremost, we need a reference to the GridClass class. We should try and get that in Start(), or Awake(), if possible.
 		//Though I'd rather avoid having to feed the floor into this... there may not be another way, that I can see. 
 		//We'll see what happens.
-		if (obstructable_along_trajectory) {
-			//...trigger pathfinding
-		}
+//		if (obstructable_along_trajectory) {
+//			//...trigger pathfinding
+//			this.m_Floors[0].FindPath(
+//		}
 
 		//But we should obviously only be doing the bit about finding the path if our current trajectory leads through an obstructable.
 		//I'm worried about shooting a ray to determine whether or not there's an obstructable ahead. It might be safer to devise a way

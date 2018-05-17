@@ -885,5 +885,6 @@ MonoBehaviour:
   m_Floor: {fileID: 2087449572}
   m_GridBox_Prefab: {fileID: 1578983373090010, guid: d777c59e007b3449fb37b5ed906bdb7c,
     type: 2}
-  m_GridBoxesPerFloorX: 20
-  m_GridBoxesPerFloorZ: 20
+  m_GridBoxesPerFloorX: 15
+  m_GridBoxesPerFloorZ: 15
+  m_NeighborList: 
