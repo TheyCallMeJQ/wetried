@@ -275,10 +275,6 @@ public class GridBox : MonoBehaviour {
 		return this.m_NeighborIndices;
 	}
 
-//	public bool SetGridboxHasBeenCheckedForPathfinding(bool status)
-//	{
-//		this.m_HasBeenCheckedForPathfinding = status;
-//	}
 
 	public void SetGridboxDistanceFromFlag(int distance)
 	{

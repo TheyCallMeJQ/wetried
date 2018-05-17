@@ -117,37 +117,37 @@ public class GridClass : MonoBehaviour {
 		this.CheckGridBoxesAndAssignDistances (index_to);
 
 		List<GridBox> path = new List<GridBox> ();
-
+		foreach (int list_item in this.FindPathWithSmallestNeighbors(index_from)) {
+			path.Add (this.m_Grid[list_item]);
+		}
 		return path;
 	}
 
-//	private List<int> RecursiveIterateToFindSmallestNeighbors(int start_index)
-//	{
-//		if (this.m_Grid [start_index].GetGridboxDistanceFromFlag () != 0) {
-//			this.FindIndexOfSmallestNeighbor
-//			//by now we have the smallest
-//
-//		} else {
-//			return 
-//		}
-//
-//	}
-//
-//	private int FindIndexOfSmallestNeighbor(int start_index)
-//	{
-//		//placeholder, until we actually find the smallest value
-//		int index_of_smallest = start_index;
-//		foreach (int neighbor in this.m_Grid[start_index].GetNeighborIndices()) {
-//			if (neighbor > -1) {
-//				//if there exists a neighbor with distance smaller than the smallest, it becomes the new smallest
-//				int neighbor_distance = this.m_Grid [neighbor].GetGridboxDistanceFromFlag ();
-//				if (neighbor_distance < this.m_Grid [index_of_smallest].GetGridboxDistanceFromFlag ()) {
-//					index_of_smallest = neighbor;
-//				}
-//			}
-//		}
-//		return index_of_smallest;
-//	}
+	private List<int> FindPathWithSmallestNeighbors(int start_index)
+	{
+		List<int> list_to_return = new List<int> ();
+		list_to_return.Add(this.FindIndexOfSmallestNeighbor(start_index));
+		for (int length = 1; length < this.m_Grid [start_index].GetGridboxDistanceFromFlag(); length++) {
+			list_to_return.Add (this.FindIndexOfSmallestNeighbor (list_to_return [list_to_return.Count - 1]));
+		}
+		return list_to_return;
+	}
+
+	private int FindIndexOfSmallestNeighbor(int start_index)
+	{
+		//placeholder, until we actually find the smallest value
+		int index_of_smallest = start_index;
+		foreach (int neighbor in this.m_Grid[start_index].GetNeighborIndices()) {
+			if (neighbor > -1 && this.m_Grid [neighbor].GetGridboxDistanceFromFlag () > -1) {
+				//if there exists a neighbor with distance smaller than the smallest, it becomes the new smallest
+				int neighbor_distance = this.m_Grid [neighbor].GetGridboxDistanceFromFlag ();
+				if (neighbor_distance < this.m_Grid [index_of_smallest].GetGridboxDistanceFromFlag ()) {
+					index_of_smallest = neighbor;
+				}
+			}
+		}
+		return index_of_smallest;
+	}
 
 	public bool ObstructableAlongTrajectory(int current_index, int target_index)
 	{
@@ -289,8 +289,9 @@ public class GridClass : MonoBehaviour {
 	}
 
 
-	/**A function to reset the grid after each pathfinding search*/
-	private void ResetGridCheckedStatus()
+	/**A function to reset the grid after each pathfinding search
+	*/
+	public void ResetGridCheckedStatus()
 	{
 		foreach (GridBox box in this.m_Grid) {
 			box.ResetGridboxDistanceFromFlag();
