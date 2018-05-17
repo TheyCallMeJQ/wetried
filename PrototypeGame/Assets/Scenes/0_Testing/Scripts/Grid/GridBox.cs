@@ -282,7 +282,12 @@ public class GridBox : MonoBehaviour {
 
 	public void SetGridboxDistanceFromFlag(int distance)
 	{
-		this.m_DistanceFromDestination = 0;
+		this.m_DistanceFromDestination = distance;
+	}
+
+	public int GetGridboxDistanceFromFlag()
+	{
+		return this.m_DistanceFromDestination;
 	}
 
 	/**A function to be called on each gridbox in our resetting of the grid after each successful pathfinding*/
