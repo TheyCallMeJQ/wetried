@@ -160,9 +160,9 @@ MonoBehaviour:
     type: 2}
   m_Floors:
   - {fileID: 2087449577}
-  m_TerminalVelocity: 1
-  m_Acceleration: 0.5
-  m_TimeTillRest: 0.2
+  m_TerminalVelocity: 0.2
+  m_Acceleration: 0.25
+  m_TimeTillRest: 0.4
   m_CurrentVelocity: 0
   m_GridBoxCurrentIndex: -1
 --- !u!1 &95256790

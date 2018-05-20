@@ -1,6 +1,7 @@
 ﻿//#define TESTING_GRID_FUNCTIONALITIES
 //#define TESTING_NEIGHBOR_ASSIGNMENT
 #define TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+#define TESTING_NATURALIZED_PATH_ACQUISITION
 
 using System.Collections;
 using System.Collections.Generic;
@@ -112,6 +113,38 @@ public class GridClass : MonoBehaviour {
 	}//end f'n InitializeGrid()
 
 	/**A function intended to be called from the PlayerMovement class - finds and returns the path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
+	public List<GridBox> FindPath_Naturalized(int index_from, int index_to)
+	{
+		this.CheckGridBoxesAndAssignDistances (index_to);
+
+		List<GridBox> path = new List<GridBox> ();
+		foreach (int list_item in this.FindPathWithSmallestNeighbors(index_from)) {
+			path.Add (this.m_Grid[list_item]);
+		}
+
+		//we could further "naturalize" this movement by returning a path filled with only the nodes right before an obstructable
+		List<GridBox> naturalized_path = new List<GridBox>();
+		int start = index_from;
+		#if TESTING_NATURALIZED_PATH_ACQUISITION
+		string message = "";
+		#endif
+		for (int index = 0; index < path.Count; index++) {
+			if (this.ObstructableAlongTrajectory (start, path[index].GetBoxIndex ())) {
+				naturalized_path.Add (path [index - 1]);
+				#if TESTING_NATURALIZED_PATH_ACQUISITION
+				message += "Obstruction detected between gridbox " + start + " and " + path[index].GetBoxIndex() + ". Added gridbox " + path [index - 1].GetBoxIndex () + " to naturalized path\n";
+				#endif
+				start = path[index - 1].GetBoxIndex();
+			}
+		}
+		naturalized_path.Add (path [path.Count - 1]);
+		#if TESTING_NATURALIZED_PATH_ACQUISITION
+		Debug.Log (message);
+		#endif
+		return naturalized_path;
+	}
+
+	/**A function intended to be called from the PlayerMovement class - finds and returns the path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
 	public List<GridBox> FindPath(int index_from, int index_to)
 	{
 		this.CheckGridBoxesAndAssignDistances (index_to);
@@ -120,6 +153,7 @@ public class GridClass : MonoBehaviour {
 		foreach (int list_item in this.FindPathWithSmallestNeighbors(index_from)) {
 			path.Add (this.m_Grid[list_item]);
 		}
+
 		return path;
 	}
 
