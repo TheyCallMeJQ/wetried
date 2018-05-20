@@ -453,7 +453,8 @@ public class PlayerMovement : MonoBehaviour {
 				//if the trajectory is obstructed...
 				if (obstructable_along_trajectory) {
 					//...then make preparations for pathfinding-oriented movement
-					this.m_Path = this.m_Floors [0].FindPath (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
+//					this.m_Path = this.m_Floors [0].FindPath (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
+					this.m_Path = this.m_Floors [0].FindPath_Naturalized (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
 
 					#if TESTING_PATHFINDING_PATHFOUND
 					string message = "Found the following as pathfinding path:\n";
