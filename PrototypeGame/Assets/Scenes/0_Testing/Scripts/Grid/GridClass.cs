@@ -185,8 +185,10 @@ public class GridClass : MonoBehaviour {
 		int row_negative = row_count > 0 ? -1 : 1;
 		int column_negative = column_count > 0 ? -1 : 1;
 
-		for (int row = 0; row < Mathf.Abs (row_count); row++) {
-			for (int column = 0; column < Mathf.Abs (column_count); column++) {
+//		for (int row = 0; row < Mathf.Abs (row_count); row++) {
+//			for (int column = 0; column < Mathf.Abs (column_count); column++) {
+		for (int row = 0; row <= Mathf.Abs (row_count); row++) {
+			for (int column = 0; column <= Mathf.Abs (column_count); column++) {
 				int index_under_investigation = current_index + (column * column_negative) + (this.m_GridBoxesPerFloorX * row * row_negative);
 				//For first click, we have player gridbox index mapped to -1
 				if (index_under_investigation < 0) {
