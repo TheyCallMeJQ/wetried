@@ -20,7 +20,7 @@ public class GridBox : MonoBehaviour {
 
 	/**An int value representing the distance from the target the player is moving to, along the defined neighbors, and excluding passage through obstructed gridboxes.
 	*NOTE: Should be private in final rendition.*/
-	public int m_DistanceFromDestination = -1;
+	private int m_DistanceFromDestination = -1;
 
 	/**A function to have the gridbox check whether or not it is obstructed by anything.
 	* Note: we count anything under the "Obstructable" layer as being something that can obstruct the gridbox.
@@ -28,6 +28,18 @@ public class GridBox : MonoBehaviour {
 	*/
 	public void VerifyObstructionStatus()
 	{
+		//first check from the center of the gridbox
+		Vector3 center = this.transform.position - new Vector3(0.0f, 0.1f, 0.0f);
+		foreach(RaycastHit hit in Physics.RaycastAll(center, Vector3.up, this.m_HeightOfObstructionCheck))
+		{
+			if (hit.collider.gameObject.layer == UnityEngine.LayerMask.NameToLayer("Obstructable")) {
+				//					Debug.Log ("Obstructable detected");
+				this.m_IsObstructed = true;
+				return;
+			}
+		}
+
+		//then check from each of four corners
 		float boxgrid_width_half = this.transform.lossyScale.x / 2.0f;
 		float boxgrid_depth_half = this.transform.lossyScale.z / 2.0f;
 
