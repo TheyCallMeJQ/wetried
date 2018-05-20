@@ -49,3 +49,6 @@ And for FindPath(int index_from, int index_to)
         then check that gridbox's neighbors in turn
     //Note order is significant here. We first check all immediate neighbors, then search the subtrees one at a time    
     
+05/20/2018
+At this point we’ve implemented rudimentary pathfinding and made it look somewhat natural (the naturalization stems from us returning a path made up of specifically only the points we need to go to in order to avoid the obstructables, as opposed to the entire path).
+Though there are some problems with the algorithm. At the moment, if we click inside a room with four sealed walls, we can still go inside it (though I suspect this may be a problem related to the naturalization function, or simply lack of foresight with respect to genuinely impossible paths - we’d always assumed the paths were possible up to now). The algorithm I’m using is also not the most efficient; turns out the algorithm I’m using now is called Djikstra’s algorithm (which checks absolutely all the slots, assigns them with distances, and then selects the best path). We should convert over to the A* Manhattan algorithm (which checks comparatively fewer of the slots for any one movement). 
