@@ -1,7 +1,17 @@
 ﻿//#define TESTING_GRID_FUNCTIONALITIES
 //#define TESTING_NEIGHBOR_ASSIGNMENT
-#define TESTING_FINDING_OBSTRUCTED_GRIDBOXES
-#define TESTING_NATURALIZED_PATH_ACQUISITION
+//#define TESTING_FINDING_OBSTRUCTED_GRIDBOXES
+//#define TESTING_NATURALIZED_PATH_ACQUISITION
+//#define TESTING_MANHATTAN_PATHFINDING
+
+#define EXPERIMENTATION_MANHATTAN
+//#define EXPERIMENTATION_DJIKSTRA
+
+#if EXPERIMENTATION_MANHATTAN
+#undef EXPERIMENTATION_DJIKSTRA
+#elif EXPERIMENTATION_DJIKSTRA
+#undef EXPERIMENTATION_MANHATTAN
+#endif
 
 using System.Collections;
 using System.Collections.Generic;
@@ -26,11 +36,18 @@ public class GridClass : MonoBehaviour {
 	/**Grid boxes desired along floor "height"; to be set from the Inspector
 	*This quantity is effectively the number of grid boxes per column.*/
 	public int m_GridBoxesPerFloorZ;
+
+
 	/**An int value to represent the current distance from the flag for the neighbors whose indices are in the neighbor list.*/
 	private int m_CurrentDistanceFromFlag = 0;
 	/**A list containing all neighbors up for pathfinding inspection.
 	*Note: this property should be private in the final iteration.*/
-	public List<int> m_NeighborList = new List<int> ();
+	private List<int> m_NeighborList = new List<int> ();
+
+	/**The list of gridboxes currently up for contention*/
+	public List<int> m_OpenList = new List<int>();
+	/**The list of gridboxes we know are part of our path*/
+	public List<int> m_ClosedList = new List<int>();
 
 	void Awake()
 	{
@@ -112,7 +129,8 @@ public class GridClass : MonoBehaviour {
 		#endif
 	}//end f'n InitializeGrid()
 
-	/**A function intended to be called from the PlayerMovement class - finds and returns the path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
+	#if EXPERIMENTATION_DJIKSTRA
+	/**A function intended to be called from the PlayerMovement class - finds and returns the naturalized path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
 	public List<GridBox> FindPath_Naturalized(int index_from, int index_to)
 	{
 		this.CheckGridBoxesAndAssignDistances (index_to);
@@ -143,18 +161,254 @@ public class GridClass : MonoBehaviour {
 		#endif
 		return naturalized_path;
 	}
+	#endif
 
-	/**A function intended to be called from the PlayerMovement class - finds and returns the path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
-	public List<GridBox> FindPath(int index_from, int index_to)
+	/**Assigns G value to immediate neighbors so long as those neighbors:
+		- Aren't obstructed
+		- Are within the grid (don't have index -1)
+		- Aren't on the open or the closed list*/
+	private void AssignGToImmediateNeighbors(int grid_box, int G)
 	{
-		this.CheckGridBoxesAndAssignDistances (index_to);
+		#if TESTING_MANHATTAN_PATHFINDING
+		string message = "";
+		message += "Assigning G value " + G + " for immediate neighbors to slot " + grid_box + ":\t";
+		#endif
+		foreach (int neighbor in this.m_Grid[grid_box].GetNeighborIndices()) {
+			bool neighbor_is_invalid = (neighbor == -1) || this.m_Grid [neighbor].IsGridBoxObstructed ();
+			if (!neighbor_is_invalid && !this.GridBoxIsInClosedList(neighbor) && !this.GridBoxIsInOpenList(neighbor)) {
+				#if TESTING_MANHATTAN_PATHFINDING
+				message += neighbor + " ";
+				#endif
+				this.m_Grid [neighbor].SetG (G);
+			}
+		}
+		#if TESTING_MANHATTAN_PATHFINDING
+		Debug.Log(message);
+		#endif
+	}
 
-		List<GridBox> path = new List<GridBox> ();
-		foreach (int list_item in this.FindPathWithSmallestNeighbors(index_from)) {
-			path.Add (this.m_Grid[list_item]);
+	/**A function to find and assign the H-value, the distance to the [destination_index] gridbox, for the given [grid_box] index's immediate neighbors*/
+	private void ComputeHForImmediateNeighbors(int grid_box, int destination_index)
+	{
+		int destination_row = (destination_index / this.m_GridBoxesPerFloorX) + 1;
+		int destination_column = (destination_index % this.m_GridBoxesPerFloorX) + 1;
+
+		//The sum of the difference in rows and columns between a given grid box and the destination is equal to the distance covered
+		//between the two.
+		foreach (int neighbor_index in this.m_Grid[grid_box].GetNeighborIndices()) {
+			bool neighbor_is_invalid = (neighbor_index == -1) || this.m_Grid [neighbor_index].IsGridBoxObstructed ();
+			if (!neighbor_is_invalid && !this.GridBoxIsInClosedList(neighbor_index) && !this.GridBoxIsInOpenList(neighbor_index)) {
+				int neighbor_gridbox_row = (neighbor_index / this.m_GridBoxesPerFloorX) + 1;
+				int neighbor_gridbox_column = (neighbor_index % this.m_GridBoxesPerFloorX) + 1;
+
+				int total_distance = Mathf.Abs (neighbor_gridbox_row - destination_row) + Mathf.Abs (neighbor_gridbox_column - destination_column);
+				this.m_Grid [neighbor_index].SetH (total_distance);
+			}
+		}
+	}
+
+	/**A function to let us know whether the given grid box index is contained in the open list*/
+	private bool GridBoxIsInOpenList(int grid_box)
+	{
+		foreach (int index in this.m_OpenList) {
+			if (grid_box == index) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**A function to let us know whether the given grid box index is contained in the closed list*/
+	private bool GridBoxIsInClosedList(int grid_box)
+	{
+		foreach (int index in this.m_ClosedList) {
+			if (grid_box == index) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void AddImmediateNeighborsToOpenList(int index_from)
+	{
+		#if TESTING_MANHATTAN_PATHFINDING
+		string message = "Added to open list immediate neighbors to slot " + index_from + " :\t";
+		#endif
+		foreach (int neighboring_index in this.m_Grid[index_from].GetNeighborIndices()) {
+			bool neighbor_is_invalid = (neighboring_index == -1) || this.m_Grid [neighboring_index].IsGridBoxObstructed ();
+			if (!neighbor_is_invalid && !this.GridBoxIsInClosedList(neighboring_index) && !this.GridBoxIsInOpenList(neighboring_index)) {
+				this.m_OpenList.Add (neighboring_index);
+				#if TESTING_MANHATTAN_PATHFINDING
+				message += neighboring_index + " ";
+				#endif
+			}
+		}
+		#if TESTING_MANHATTAN_PATHFINDING
+		Debug.Log(message);
+		#endif
+	}
+
+	/**A function to compute the F values for every element in the open list whose F value is still set to default value 0*/
+	private void ComputeFValuesForOpenList()
+	{
+		foreach (int grid_box_index in this.m_OpenList) {
+			GridBox grid_box = this.m_Grid [grid_box_index];
+			if (grid_box.GetF () == 0) {
+				grid_box.ComputeF ();
+			}
+		}
+	}
+
+	/**A function to find the immediate valid neighbor slot with the lowest and most recently added F value, add it to the closed list, and remove it from the open list*/
+	private void FindLowestFAndAddToClosedList()
+	{
+		#if TESTING_MANHATTAN_PATHFINDING
+		string message = "";
+		#endif
+
+		//Default initial values
+		int index_of_lowest_F = -1;
+
+		GridBox closedlist_last_gridbox = this.m_Grid [this.m_ClosedList [this.m_ClosedList.Count - 1]];
+//		int value_of_lowest_F = closedlist_last_gridbox.GetF();
+		int value_of_lowest_F = this.m_GridBoxesPerFloorX * this.m_GridBoxesPerFloorZ;
+//		if (this.m_ClosedList.Count == 1) {
+//			value_of_lowest_F = this.m_GridBoxesPerFloorX * this.m_GridBoxesPerFloorZ;
+//		}
+		int value_of_greatest_G = closedlist_last_gridbox.GetG ();
+		//Recall that the most recently added entries will be at the end of the list
+		for (int index = 0; index < this.m_OpenList.Count; index++) {
+//		for (int index = this.m_OpenList.Count - 1; index >= 0; index--) {
+			GridBox openlist_gridbox = this.m_Grid [this.m_OpenList [index]];
+			if (openlist_gridbox.GetF () <= value_of_lowest_F && openlist_gridbox.GetG() > closedlist_last_gridbox.GetG()) {
+				index_of_lowest_F = index;
+				value_of_lowest_F = openlist_gridbox.GetF ();
+			}
 		}
 
-		return path;
+		if (index_of_lowest_F == -1) {
+			index_of_lowest_F = this.m_OpenList.Count - 1;
+		}
+
+		//now we add the lowest-valued F gridbox index of the open list to the closed list
+		this.m_ClosedList.Add (this.m_OpenList [index_of_lowest_F]);
+
+		#if TESTING_MANHATTAN_PATHFINDING
+		message += "Slot with lowest F found to be: " + this.m_Grid[this.m_OpenList [index_of_lowest_F]] + " - adding to closed list";
+		Debug.Log(message);
+		#endif
+
+		//and then we remove it from the open list
+		this.m_OpenList.RemoveAt (index_of_lowest_F);
+	}
+
+	private void FindClosedList(int index_from, int index_to, int G)
+	{
+		//Then assign G and H values to immediate neighbors
+		this.AssignGToImmediateNeighbors(index_from, G);
+		this.ComputeHForImmediateNeighbors (index_from, index_to);
+		//And add them to the open list
+		this.AddImmediateNeighborsToOpenList(index_from);
+		//Then compute F values
+		this.ComputeFValuesForOpenList();
+		//Add most recently added and lowest F value to the closed list
+		this.FindLowestFAndAddToClosedList();
+
+
+//		#if TESTING_MANHATTAN_PATHFINDING
+//		string message = "";
+//		foreach(int neighboring_index in this.m_Grid[index_from].GetNeighborIndices())
+//		{
+//			bool neighbor_is_invalid = (neighboring_index == -1) || this.m_Grid [neighboring_index].IsGridBoxObstructed ();
+//			if (!neighbor_is_invalid) {
+//				message += "Neighbor " + neighboring_index + " assigned: " + 
+//			}
+//		}
+//		#endif
+
+		int last_closed_list_entry = this.m_ClosedList [this.m_ClosedList.Count - 1];
+		if (last_closed_list_entry != index_to) {
+			G++;
+			this.FindClosedList (last_closed_list_entry, index_to, G);
+		}
+	}
+
+	/**A function to clear the information needed to restart the A* Manhattan pathfinding algorithm*/
+	public void ResetPathfindingInformation()
+	{
+		Debug.Log ("Reset pathfinding info");
+		foreach (int index in this.m_ClosedList) {
+			this.m_Grid [index].SetG (0);
+			this.m_Grid [index].SetH (0);
+			this.m_Grid [index].ComputeF ();
+		}
+		foreach (int index in this.m_OpenList) {
+			this.m_Grid [index].SetG (0);
+			this.m_Grid [index].SetH (0);
+			this.m_Grid [index].ComputeF ();
+		}
+
+		this.m_ClosedList.Clear ();
+		this.m_OpenList.Clear ();
+	}
+
+	#if EXPERIMENTATION_MANHATTAN
+	/**A function intended to be called from the PlayerMovement class - finds and returns the naturalized path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
+	public List<GridBox> FindPath_Naturalized(int index_from, int index_to)
+	{
+		//First add starting position to closed list
+		this.m_ClosedList.Add(index_from);
+		int G = 1;
+
+		this.FindClosedList (index_from, index_to, G);
+
+		//we could further "naturalize" this movement by returning a path filled with only the nodes right before an obstructable
+		List<GridBox> naturalized_path = new List<GridBox>();
+		int start = index_from;
+		#if TESTING_NATURALIZED_PATH_ACQUISITION
+		string message = "";
+		#endif
+		for (int index = 0; index < this.m_ClosedList.Count; index++) {
+			if (this.ObstructableAlongTrajectory (start, this.m_ClosedList[index])) {
+				naturalized_path.Add (this.m_Grid[this.m_ClosedList[index - 1]]);
+//				naturalized_path.Add (path [index - 1]);
+				#if TESTING_NATURALIZED_PATH_ACQUISITION
+//				message += "Obstruction detected between gridbox " + start + " and " + path[index].GetBoxIndex() + ". Added gridbox " + path [index - 1].GetBoxIndex () + " to naturalized path\n";
+				message += "Obstruction detected between gridbox " + start + " and " + this.m_ClosedList[index] + ". Added gridbox " + this.m_ClosedList[index - 1] + " to naturalized path\n";
+				#endif
+//				start = path[index - 1].GetBoxIndex();
+				start = this.m_ClosedList[index - 1];
+			}
+		}
+		naturalized_path.Add (this.m_Grid [this.m_ClosedList [this.m_ClosedList.Count - 1]]);
+		#if TESTING_NATURALIZED_PATH_ACQUISITION
+		Debug.Log (message);
+		#endif
+		return naturalized_path;
+	}
+	#endif
+
+	/**A function intended to be called from the PlayerMovement class - finds and returns the path (without naturalization) the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
+	public List<GridBox> FindPath(int index_from, int index_to)
+	{
+		//First add starting position to closed list
+		this.m_ClosedList.Add(index_from);
+		int G = 1;
+
+		this.FindClosedList (index_from, index_to, G);
+		List<GridBox> templist = new List<GridBox> ();
+		foreach (int index in this.m_ClosedList) {
+			templist.Add (this.m_Grid[index]);
+		}
+		return templist;
+//		this.CheckGridBoxesAndAssignDistances (index_to);
+//
+//		List<GridBox> path = new List<GridBox> ();
+//		foreach (int list_item in this.FindPathWithSmallestNeighbors(index_from)) {
+//			path.Add (this.m_Grid[list_item]);
+//		}
+//
+//		return path;
 	}
 
 	private List<int> FindPathWithSmallestNeighbors(int start_index)
@@ -335,4 +589,6 @@ public class GridClass : MonoBehaviour {
 		this.m_CurrentDistanceFromFlag = 0;
 		this.m_NeighborList.Clear ();
 	}
+
+
 }

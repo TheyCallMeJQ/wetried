@@ -22,6 +22,41 @@ public class GridBox : MonoBehaviour {
 	*NOTE: Should be private in final rendition.*/
 	private int m_DistanceFromDestination = -1;
 
+	//*** A* Manhattan
+	/**An int value to represent [this] grid box's distance from the player's starting position; used in A* Manhattan pathfinding algorithm
+	Should be private in final iteration.*/
+	public int m_G = 0;
+	/**An int value to represent [this] grid box's distance from the player's destination (specifically, without respect to obstructables)
+	Should be private in final iteration.*/
+	public int m_H = 0;
+	/**An int value representing the sum of values G and H, which is used to compute the next best move for the player in the pathfinding algorithm*/
+	private int m_F = 0;
+
+	public void SetG(int G)
+	{
+		this.m_G = G;
+	}
+
+	public void SetH(int H)
+	{
+		this.m_H = H;
+	}
+
+	public void ComputeF()
+	{
+		this.m_F = this.m_G + this.m_H;
+	}
+
+	public int GetF()
+	{
+		return this.m_F;
+	}
+
+	public int GetG()
+	{
+		return this.m_G;
+	}
+
 	/**A function to have the gridbox check whether or not it is obstructed by anything.
 	* Note: we count anything under the "Obstructable" layer as being something that can obstruct the gridbox.
 	* If a gridbox is obstructed, the player can't walk there.

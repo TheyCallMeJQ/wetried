@@ -2,7 +2,7 @@
 * A script to be attached as a component to the player container gameobject to facilitate movement.
 */
 
-#define TESTING_PATHFINDING_PATHFOUND
+//#define TESTING_PATHFINDING_PATHFOUND
 
 using System.Collections;
 using System.Collections.Generic;
@@ -86,45 +86,6 @@ public class PlayerMovement : MonoBehaviour {
 			this.m_Deceleration = 0.0f;
 		}
 	}
-
-//	/**A function to manage the acceleration, deceleration, and motion we apply to the player*/
-//	private void ApplyMovement()
-//	{
-//		// If motion has been initiated
-//		if (this.m_PlayerMovementFlag_Instance != null) {
-//
-//			//In the more primitive version of motion, we set the direction right from the get-go, from the flag position.
-//
-//			//If the player should be accelerating...
-//			if (this.PlayerShouldBeAccelerating ()) {
-//				//...begin by finding the direction of the motion, if we don't know it yet
-//				if (this.WeNeedANewDirectionOfMotion ()) {
-//					this.FindAndNormalizeDirectionOfMotion ();
-//				}
-//				//...then apply acceleration to the current velocity vector
-//				this.ApplyAccelerationToCurrentVelocity();
-//			} 
-//			//else if the player should be decelerating...
-//			else {
-//				//...first find the value the deceleration must have, if we don't know it yet
-//				if (this.DecelerationMustBeFound ()) {
-//					this.FindDeceleration ();
-//				}
-//				//...and then apply it
-//				this.ApplyDecelerationToCurrentVelocity();
-//				//...and if the player is where they need to be, reset the deceleration and remove the movement flag
-//				if (this.PlayerHasArrivedToDestination ()) {
-//					//Reset deceleration
-//					this.m_Deceleration = 0.0f;
-//					//Destroy movement flag
-//					this.RemovePlayerMovementFlag ();
-//					return;
-//				}
-//			}//end else
-//
-//			this.ApplyVelocityAndDirectionOfMotionToPlayer ();
-//		}//end if flag exists
-//	}
 
 	/**A function to manage the acceleration, deceleration, and motion we apply to the player*/
 	private void ApplyMovement()
@@ -230,20 +191,6 @@ public class PlayerMovement : MonoBehaviour {
 		this.transform.position += motion;
 	}
 
-//	/**A function to tell us whether or no we need to update our direction of motion.
-//	*This function will grow more complex with the addition of the pathfinding, but for now, the only information we need is whether or not we're at rest.*/
-//	private bool WeNeedANewDirectionOfMotion()
-//	{
-//		Vector3 player_to_flag = this.m_PlayerMovementFlag_Instance.transform.position - this.transform.position;
-//		Vector2 twoD_player_to_flag = new Vector2 (player_to_flag.x, player_to_flag.z);
-//		Vector2 current_orientation_of_motion = new Vector2 (this.m_DirectionOfMotion.x, this.m_DirectionOfMotion.z);
-//		bool we_are_moving_in_the_wrong_direction = Vector2.Dot (twoD_player_to_flag, current_orientation_of_motion) != 1.0f;
-//
-//		//For instance, we could say we update this for every gridbox we pass through, in the later stages
-//
-//		return this.m_CurrentVelocity == 0.0f && we_are_moving_in_the_wrong_direction;
-//	}
-
 	/**A function to tell us whether or no we need to update our direction of motion.
 	*This function will grow more complex with the addition of the pathfinding, but for now, the only information we need is whether or not we're at rest.*/
 	private bool WeNeedANewDirectionOfMotion_NormalMove()
@@ -270,17 +217,6 @@ public class PlayerMovement : MonoBehaviour {
 
 		return within_flag_radius && flag_not_at_position_of_last_path_node;
 	}
-
-//	/**Update and normalize the direction in which we're moving.
-//	*Note that this is going to be working along the XZ plane, specifically.*/
-//	private void FindAndNormalizeDirectionOfMotion()
-//	{
-//		Vector2 current_position = new Vector2 (this.transform.position.x, this.transform.position.z);
-//		Vector2 flag_position = new Vector2 (this.m_PlayerMovementFlag_Instance.transform.position.x, this.m_PlayerMovementFlag_Instance.transform.position.z);
-//		Vector2 twoD_directionOfMotion = flag_position - current_position;
-//		this.m_DirectionOfMotion = new Vector3 (twoD_directionOfMotion.x, 0.0f, twoD_directionOfMotion.y);
-//		this.m_DirectionOfMotion.Normalize ();
-//	}
 
 	/**Update and normalize the direction in which we're moving.
 	*Note that this is going to be working along the XZ plane, specifically.*/
@@ -320,16 +256,6 @@ public class PlayerMovement : MonoBehaviour {
 		return this.m_CurrentVelocity == 0.0f;
 	}
 
-//	/**A function to tell us whether or not the player should be in the process of accelerating.
-//	*We're accelerating where a movement flag instance has been triggered and we're not within the radius of the prefab*/
-//	private bool PlayerShouldBeAccelerating()
-//	{
-//		Vector2 current_position = new Vector2 (this.transform.position.x, this.transform.position.z);
-//		Vector2 flag_position = new Vector2 (this.m_PlayerMovementFlag_Instance.transform.position.x, this.m_PlayerMovementFlag_Instance.transform.position.z); 
-//		Vector2 flag_to_current_position = flag_position - current_position;
-//		float distance_to_flag = flag_to_current_position.magnitude;
-//		return (distance_to_flag > this.m_MovementFlagInstanceRadius);
-//	}
 
 	/**A function to tell us whether or not the player should be in the process of accelerating.
 	*We're accelerating where a movement flag instance has been triggered and we're not within the radius of the prefab*/
@@ -430,13 +356,16 @@ public class PlayerMovement : MonoBehaviour {
 	 * A function to create the flag designating where the player gameobject is moving towards*/
 	public void CreatePlayerMovementFlag()
 	{
+		this.m_Floors[0].ResetPathfindingInformation();
+
+
 		//If there's already a flag when we trigger the flag creation, destroy the currently existing flag to make room for the new one
 		if (this.m_PlayerMovementFlag_Instance != null) {
 			RemovePlayerMovementFlag ();
 			this.m_CurrentVelocity /= 10.0f;
 
 			this.m_Path.Clear ();
-			this.m_Floors [0].ResetGridCheckedStatus ();
+//			this.m_Floors [0].ResetGridCheckedStatus ();
 		}
 
 		//Create a flag where we clicked
@@ -455,11 +384,13 @@ public class PlayerMovement : MonoBehaviour {
 					//...then make preparations for pathfinding-oriented movement
 //					this.m_Path = this.m_Floors [0].FindPath (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
 					this.m_Path = this.m_Floors [0].FindPath_Naturalized (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
+					Debug.Log ("Path found? " + (this.m_Path.Count > 0));
 
 					#if TESTING_PATHFINDING_PATHFOUND
 					string message = "Found the following as pathfinding path:\n";
 					foreach (GridBox item in this.m_Path) {
-						message += "gridbox " + item.GetBoxIndex() + " distance: " + item.GetGridboxDistanceFromFlag() + "\n";
+//						message += "gridbox " + item.GetBoxIndex() + " distance: " + item.GetGridboxDistanceFromFlag() + "\n";
+						message += "gridbox " + item.GetBoxIndex() + " G: " + item.m_G + " H: " + item.m_H + " F: " + item.GetF() + "\n";
 					}
 					Debug.Log (message);
 					#endif
