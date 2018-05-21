@@ -52,3 +52,23 @@ And for FindPath(int index_from, int index_to)
 05/20/2018
 At this point we’ve implemented rudimentary pathfinding and made it look somewhat natural (the naturalization stems from us returning a path made up of specifically only the points we need to go to in order to avoid the obstructables, as opposed to the entire path).
 Though there are some problems with the algorithm. At the moment, if we click inside a room with four sealed walls, we can still go inside it (though I suspect this may be a problem related to the naturalization function, or simply lack of foresight with respect to genuinely impossible paths - we’d always assumed the paths were possible up to now). The algorithm I’m using is also not the most efficient; turns out the algorithm I’m using now is called Djikstra’s algorithm (which checks absolutely all the slots, assigns them with distances, and then selects the best path). We should convert over to the A* Manhattan algorithm (which checks comparatively fewer of the slots for any one movement). 
+Another thing we’ll need to work on is inter-grid movement. Specifically, we need to make it such that, if we say there are two grids in the scene, you need to be able to move from one grid to the other. Let’s start by refining the pathfinding, though.
+So, changes to make:
+    - Add instance variables to grid box class (all of which will need to be reset with each click):
+		- distance from starting position to the given grid box, G
+		- distance from finishing position to the given grid box, H, without regard for obstructables
+		- total distance score for grid box, F, such that F = G + H
+    So obviously we're gonna need to think up a way to count the distances  
+    - Add instance variables to player movement class (Note: I've been thinking, and it might be nice to eventually have a more general Movement class and have PlayerMovement extend that. This way I can shorten the PlayerMovement class considerably and make the movement stuff applicable to enemies or whatever else needs to move)
+        - Open list; list of gridboxes up for contention (how will we port this over to multiple grids?)
+        - Closed list; list of gridboxes already considered
+    So the way this should work is as follows:
+        - We first add our current position to the closed list
+        - We add our four immediate neighbors to the open list
+        - We assign a score G + H = F to each element in the open list (don't bother ordering the list, it'll be quicker to just go through each element, later)
+        - Add the grid box with the lowest F score to the closed list (remember, we always add to the end of the list when we invoke List<T>::Add()) and remove it from the open list
+        - Find the immediate neighbors of the most recently added entry to the closed list, find their F values, and add them to the open list
+        - Again, choose the one with the lowest F value and add it to the closed list, removing it from the open list in the process (NOTE: If at any point you have a situation where more than one grid box added to the open list have the lowest F value, then make sure you pick whichever grid box was most recently added to the open list).
+        - Repeat until you arrive
+  
+		
