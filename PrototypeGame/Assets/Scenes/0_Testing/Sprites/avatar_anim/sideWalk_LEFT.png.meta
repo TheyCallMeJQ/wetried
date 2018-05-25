@@ -3,12 +3,7 @@ guid: 5338847404cdcb14dadc1de265da357e
 timeCreated: 1525882101
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName:
-    21300000: sideWalk_LEFT_0
-    21300002: sideWalk_LEFT_1
-    21300004: sideWalk_LEFT_2
-    21300006: sideWalk_LEFT_3
-    21300008: sideWalk_LEFT_4
+  fileIDToRecycleName: {}
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -45,7 +40,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -114,77 +109,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: sideWalk_LEFT_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 480
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: sideWalk_LEFT_1
-      rect:
-        serializedVersion: 2
-        x: 480
-        y: 480
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: sideWalk_LEFT_2
-      rect:
-        serializedVersion: 2
-        x: 960
-        y: 480
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: sideWalk_LEFT_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: sideWalk_LEFT_4
-      rect:
-        serializedVersion: 2
-        x: 480
-        y: 0
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
+    sprites: []
     outline: []
     physicsShape: []
   spritePackingTag: 

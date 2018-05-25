@@ -299,11 +299,10 @@ public class PlayerMovement : MonoBehaviour {
 	/**A function to update the player animator, with respect to the movement input (specifically, with respect to [this.m_Movement]*/
 	private void UpdateAnimator()
 	{
-		bool moving = this.m_CurrentVelocity > 0.0f;
-		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_LEFT, this.m_DirectionOfMotion.x < 0.0f && moving);
-		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_RIGHT, this.m_DirectionOfMotion.x > 0.0f && moving);
-		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_UP, this.m_DirectionOfMotion.z > 0.0f && moving);
-		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_DOWN, this.m_DirectionOfMotion.z < 0.0f && moving);
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_LEFT, this.m_DirectionOfMotion.x < 0.0f);
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_RIGHT, this.m_DirectionOfMotion.x > 0.0f);
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_UP, this.m_DirectionOfMotion.z > 0.0f);
+		this.m_PlayerMovementAnimator.SetBool (ANIMATOR_PARAM_ISMOVING_DOWN, this.m_DirectionOfMotion.z < 0.0f);
 		//Note: Idle behavior is defined as an absence of any motion
 	}
 
@@ -363,7 +362,7 @@ public class PlayerMovement : MonoBehaviour {
 		//If there's already a flag when we trigger the flag creation, destroy the currently existing flag to make room for the new one
 		if (this.m_PlayerMovementFlag_Instance != null) {
 			RemovePlayerMovementFlag ();
-			this.m_CurrentVelocity = 0.0f;
+			this.m_CurrentVelocity /= 10.0f;
 
 			this.m_Path.Clear ();
 //			this.m_Floors [0].ResetGridCheckedStatus ();

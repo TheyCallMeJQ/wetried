@@ -3,11 +3,7 @@ guid: 664afe9a62d65f643a6fe6c928fdef6b
 timeCreated: 1525882101
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName:
-    21300000: frontWalk_0
-    21300002: frontWalk_1
-    21300004: frontWalk_2
-    21300006: frontWalk_3
+  fileIDToRecycleName: {}
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -44,7 +40,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,63 +109,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: frontWalk_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 480
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: frontWalk_1
-      rect:
-        serializedVersion: 2
-        x: 480
-        y: 480
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: frontWalk_2
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: frontWalk_3
-      rect:
-        serializedVersion: 2
-        x: 480
-        y: 0
-        width: 480
-        height: 480
-      alignment: 9
-      pivot: {x: 0.09, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
+    sprites: []
     outline: []
     physicsShape: []
   spritePackingTag: 
