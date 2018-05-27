@@ -71,4 +71,9 @@ So, changes to make:
         - Again, choose the one with the lowest F value and add it to the closed list, removing it from the open list in the process (NOTE: If at any point you have a situation where more than one grid box added to the open list have the lowest F value, then make sure you pick whichever grid box was most recently added to the open list).
         - Repeat until you arrive
   
-		
+05/25/2018		
+Right, so lots of stuff has happened since the last entry; we figured out Pathfinding, developing both Manhattan A* and Djikstra algorithms. I’m still not sure which is best for what we want, though for now we’re using Djikstra because the naturalization of the path looks more… natural.
+Checklist as of now:
+	- Pathfinding bugs
+	- Inventory
+	- Generalization of Movement class, with PlayerMovement, CompanionMovement, and EnemyMovement.
