@@ -54,6 +54,19 @@ public class PlayerMovement : MonoBehaviour {
 	void Awake()
 	{
 		this.m_PlayerMovementAnimator = this.GetComponentInChildren<Animator> ();
+		//Find the current gridbox index, if any
+	}
+
+	void Start()
+	{
+		Ray current_gridbox_ray = new Ray(this.transform.position + Vector3.up, -Vector3.up);
+		foreach (RaycastHit current_gridbox_hit in Physics.RaycastAll(current_gridbox_ray)) {
+			GridBox current_gridbox = current_gridbox_hit.collider.gameObject.GetComponent<GridBox> ();
+			if (current_gridbox != null) {
+				this.m_GridBoxCurrentIndex = current_gridbox.GetBoxIndex ();
+				break;
+			}
+		}
 	}
 
 	void Update()
@@ -141,40 +154,34 @@ public class PlayerMovement : MonoBehaviour {
 	/**A function to apply the movement that doesn't result from pathfinding*/
 	private void ApplyNormalMovement()
 	{
-//		// If motion has been initiated
-//		if (this.m_PlayerMovementFlag_Instance != null) {
+		//If the player should be accelerating...
+		if (this.PlayerShouldBeAccelerating_NormalMove()) {
+			//...begin by finding the direction of the motion, if we don't know it yet
+			if (this.WeNeedANewDirectionOfMotion_NormalMove()) {
+				this.FindAndNormalizeDirectionOfMotion_NormalMove ();
+			}
+			//...then apply acceleration to the current velocity vector
+			this.ApplyAccelerationToCurrentVelocity();
+		} 
+		//else if the player should be decelerating...
+		else {
+			//...first find the value the deceleration must have, if we don't know it yet
+			if (this.DecelerationMustBeFound ()) {
+				this.FindDeceleration ();
+			}
+			//...and then apply it
+			this.ApplyDecelerationToCurrentVelocity();
+			//...and if the player is where they need to be, reset the deceleration and remove the movement flag
+			if (this.PlayerHasArrivedToDestination ()) {
+				//Reset deceleration
+				this.m_Deceleration = 0.0f;
+				//Destroy movement flag
+				this.RemovePlayerMovementFlag ();
+				return;
+			}
+		}//end else
 
-			//In the more primitive version of motion, we set the direction right from the get-go, from the flag position.
-
-			//If the player should be accelerating...
-			if (this.PlayerShouldBeAccelerating_NormalMove()) {
-				//...begin by finding the direction of the motion, if we don't know it yet
-				if (this.WeNeedANewDirectionOfMotion_NormalMove()) {
-					this.FindAndNormalizeDirectionOfMotion_NormalMove ();
-				}
-				//...then apply acceleration to the current velocity vector
-				this.ApplyAccelerationToCurrentVelocity();
-			} 
-			//else if the player should be decelerating...
-			else {
-				//...first find the value the deceleration must have, if we don't know it yet
-				if (this.DecelerationMustBeFound ()) {
-					this.FindDeceleration ();
-				}
-				//...and then apply it
-				this.ApplyDecelerationToCurrentVelocity();
-				//...and if the player is where they need to be, reset the deceleration and remove the movement flag
-				if (this.PlayerHasArrivedToDestination ()) {
-					//Reset deceleration
-					this.m_Deceleration = 0.0f;
-					//Destroy movement flag
-					this.RemovePlayerMovementFlag ();
-					return;
-				}
-			}//end else
-
-			this.ApplyVelocityAndDirectionOfMotionToPlayer ();
-//		}//end if flag exists
+		this.ApplyVelocityAndDirectionOfMotionToPlayer ();
 	}
 
 	/**If our path contains anything, it means, we're pathfinding.*/
@@ -307,67 +314,31 @@ public class PlayerMovement : MonoBehaviour {
 		//Note: Idle behavior is defined as an absence of any motion
 	}
 
-//	/**
-//	 * A function to create the flag designating where the player gameobject is moving towards*/
-//	public void CreatePlayerMovementFlag()
-//	{
-//		//If there's already a flag when we trigger the flag creation, destroy the currently existing flag to make room for the new one
-//		if (this.m_PlayerMovementFlag_Instance != null) {
-//			RemovePlayerMovementFlag ();
-//			this.m_CurrentVelocity /= 10.0f;
-//
-//			this.m_Path.Clear ();
-//			this.m_Floors [0].ResetGridCheckedStatus ();
-//		}
-//	
-//		//Create a flag where we clicked
-//		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-//		foreach (RaycastHit hit in Physics.RaycastAll(ray)) {
-//			GridBox grid_box = hit.collider.gameObject.GetComponent<GridBox> ();
-//			//If what was clicked was an unobstructed gridbox...
-//			if (grid_box != null && !grid_box.IsGridBoxObstructed()) {
-//				this.m_PlayerMovementFlag_Instance = GameObject.Instantiate (this.m_PlayerMovementFlag_Prefab);
-//				this.m_PlayerMovementFlag_Instance.transform.GetComponent<SphereCollider> ().radius = this.m_MovementFlagInstanceRadius;
-//				//Move movement flag to gridbox position
-//				this.m_PlayerMovementFlag_Instance.transform.position = grid_box.transform.position;
-//				//Update direction of motion
-//				this.FindAndNormalizeDirectionOfMotion();
-//
-//				bool obstructable_along_trajectory = this.m_Floors[0].ObstructableAlongTrajectory(this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex());
-//				if (obstructable_along_trajectory) {
-//					this.m_Path = this.m_Floors [0].FindPath (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
-//
-//					#if TESTING_PATHFINDING_PATHFOUND
-//					string message = "Found the following as pathfinding path:\n";
-//					foreach (GridBox item in this.m_Path) {
-//						message += "gridbox " + item.GetBoxIndex() + " distance: " + item.GetGridboxDistanceFromFlag() + "\n";
-//					}
-//					Debug.Log (message);
-//					#endif
-//				}
-//
-//				//Update the index of the current grid box we're occupying
-//				this.m_GridBoxCurrentIndex = grid_box.GetBoxIndex ();
-//			}
-//		}//end foreach
-//
-//	}
-
 	/**
 	 * A function to create the flag designating where the player gameobject is moving towards*/
 	public void CreatePlayerMovementFlag()
 	{
 		this.m_Floors[0].ResetPathfindingInformation();
-
+		//Only update current gridbox on creation of new movement flag
+//		Debug.Log ("Updating current gridbox");
+		Ray current_gridbox_ray = new Ray(this.transform.position + Vector3.up, -Vector3.up);
+		foreach (RaycastHit current_gridbox_hit in Physics.RaycastAll(current_gridbox_ray)) {
+			GridBox current_gridbox = current_gridbox_hit.collider.gameObject.GetComponent<GridBox> ();
+			if (current_gridbox != null) {
+				this.m_GridBoxCurrentIndex = current_gridbox.GetBoxIndex ();
+				break;
+			}
+		}
 
 		//If there's already a flag when we trigger the flag creation, destroy the currently existing flag to make room for the new one
 		if (this.m_PlayerMovementFlag_Instance != null) {
+			//Update current gridbox after destroying movement flag
 			RemovePlayerMovementFlag ();
 			this.m_CurrentVelocity = 0.0f;
 
 			this.m_Path.Clear ();
-//			this.m_Floors [0].ResetGridCheckedStatus ();
-		}
+
+		} 
 
 		//Create a flag where we clicked
 		Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
@@ -380,25 +351,27 @@ public class PlayerMovement : MonoBehaviour {
 				this.m_PlayerMovementFlag_Instance.transform.GetComponent<SphereCollider> ().radius = this.m_MovementFlagInstanceRadius;
 
 				bool obstructable_along_trajectory = this.m_Floors[0].ObstructableAlongTrajectory(this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex());
+				//				bool obstructable_along_trajectory = this.m_Floors[0].ObstructableAlongTrajectory(current_gridbox_index, grid_box.GetBoxIndex());
 				//if the trajectory is obstructed...
 				if (obstructable_along_trajectory) {
 					//...then make preparations for pathfinding-oriented movement
-//					this.m_Path = this.m_Floors [0].FindPath (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
+					//					this.m_Path = this.m_Floors [0].FindPath (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
 					this.m_Path = this.m_Floors [0].FindPath_Naturalized (this.m_GridBoxCurrentIndex, grid_box.GetBoxIndex ());
-					Debug.Log ("Path found? " + (this.m_Path.Count > 0));
+//					Debug.Log ("Path found? " + (this.m_Path.Count > 0));
 
 					#if TESTING_PATHFINDING_PATHFOUND
 					string message = "Found the following as pathfinding path:\n";
 					foreach (GridBox item in this.m_Path) {
-//						message += "gridbox " + item.GetBoxIndex() + " distance: " + item.GetGridboxDistanceFromFlag() + "\n";
-						message += "gridbox " + item.GetBoxIndex() + " G: " + item.m_G + " H: " + item.m_H + " F: " + item.GetF() + "\n";
+					//						message += "gridbox " + item.GetBoxIndex() + " distance: " + item.GetGridboxDistanceFromFlag() + "\n";
+					message += "gridbox " + item.GetBoxIndex() + " G: " + item.m_G + " H: " + item.m_H + " F: " + item.GetF() + "\n";
 					}
 					Debug.Log (message);
 					#endif
 					//Move movement flag to gridbox position
 					this.m_PlayerMovementFlag_Instance.transform.position = this.m_Path [0].transform.position;
 					//Update direction of motion
-					this.FindAndNormalizeDirectionOfMotion_NormalMove();
+					//					this.FindAndNormalizeDirectionOfMotion_NormalMove();
+					this.FindAndNormalizeDirectionOfMotion_PathfindingMove ();
 				} 
 				//else if the trajectory is not obstructed...
 				else {
@@ -408,9 +381,6 @@ public class PlayerMovement : MonoBehaviour {
 					//Update direction of motion
 					this.FindAndNormalizeDirectionOfMotion_NormalMove();
 				}
-
-				//Update the index of the current grid box we're occupying
-				this.m_GridBoxCurrentIndex = grid_box.GetBoxIndex ();
 			}
 		}//end foreach
 
