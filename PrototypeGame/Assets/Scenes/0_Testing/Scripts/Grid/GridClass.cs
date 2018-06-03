@@ -4,8 +4,8 @@
 //#define TESTING_NATURALIZED_PATH_ACQUISITION
 //#define TESTING_MANHATTAN_PATHFINDING
 
-// #define EXPERIMENTATION_MANHATTAN
-#define EXPERIMENTATION_DJIKSTRA
+ #define EXPERIMENTATION_MANHATTAN
+//#define EXPERIMENTATION_DJIKSTRA
 
 #if EXPERIMENTATION_MANHATTAN
 #undef EXPERIMENTATION_DJIKSTRA
@@ -61,6 +61,8 @@ public class GridClass : MonoBehaviour {
 		float start_y = this.m_Floor.transform.position.y + ((this.m_Floor.transform.lossyScale.y + this.m_GridBoxSize.y) / 2.0f);
 		float start_z = this.m_Floor.transform.position.z + ((this.m_Floor.transform.lossyScale.z - this.m_GridBoxSize.z) / 2.0f);
 		this.m_StartingPosition = new Vector3 (start_x, start_y, start_z);
+
+		this.InitializeGrid ();
 	}
 
 	#if TESTING_GRID_FUNCTIONALITIES
@@ -91,10 +93,10 @@ public class GridClass : MonoBehaviour {
 
 	}
 	#else
-	void Start()
-	{
-		this.InitializeGrid ();
-	}
+//	void Start()
+//	{
+//		this.InitializeGrid ();
+//	}
 	#endif
 
 	/**A function to create the grid illustrated by the gizmo function OnDrawGizmos().
@@ -270,15 +272,10 @@ public class GridClass : MonoBehaviour {
 		int index_of_lowest_F = -1;
 
 		GridBox closedlist_last_gridbox = this.m_Grid [this.m_ClosedList [this.m_ClosedList.Count - 1]];
-//		int value_of_lowest_F = closedlist_last_gridbox.GetF();
 		int value_of_lowest_F = this.m_GridBoxesPerFloorX * this.m_GridBoxesPerFloorZ;
-//		if (this.m_ClosedList.Count == 1) {
-//			value_of_lowest_F = this.m_GridBoxesPerFloorX * this.m_GridBoxesPerFloorZ;
-//		}
-		int value_of_greatest_G = closedlist_last_gridbox.GetG ();
+
 		//Recall that the most recently added entries will be at the end of the list
 		for (int index = 0; index < this.m_OpenList.Count; index++) {
-//		for (int index = this.m_OpenList.Count - 1; index >= 0; index--) {
 			GridBox openlist_gridbox = this.m_Grid [this.m_OpenList [index]];
 			if (openlist_gridbox.GetF () <= value_of_lowest_F && openlist_gridbox.GetG() > closedlist_last_gridbox.GetG()) {
 				index_of_lowest_F = index;
@@ -336,7 +333,6 @@ public class GridClass : MonoBehaviour {
 	/**A function to clear the information needed to restart the A* Manhattan pathfinding algorithm*/
 	public void ResetPathfindingInformation()
 	{
-		Debug.Log ("Reset pathfinding info");
 		foreach (int index in this.m_ClosedList) {
 			this.m_Grid [index].SetG (0);
 			this.m_Grid [index].SetH (0);
@@ -352,7 +348,42 @@ public class GridClass : MonoBehaviour {
 		this.m_OpenList.Clear ();
 	}
 
-	#if EXPERIMENTATION_MANHATTAN
+//	#if EXPERIMENTATION_MANHATTAN
+//	/**A function intended to be called from the PlayerMovement class - finds and returns the naturalized path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
+//	public List<GridBox> FindPath_Naturalized(int index_from, int index_to)
+//	{
+//		//First add starting position to closed list
+//		this.m_ClosedList.Add(index_from);
+//		int G = 1;
+//
+//		this.FindClosedList (index_from, index_to, G);
+//
+//		//we could further "naturalize" this movement by returning a path filled with only the nodes right before an obstructable
+//		List<GridBox> naturalized_path = new List<GridBox>();
+//		int start = index_from;
+//		#if TESTING_NATURALIZED_PATH_ACQUISITION
+//		string message = "";
+//		#endif
+//		for (int index = 0; index < this.m_ClosedList.Count; index++) {
+//			if (this.ObstructableAlongTrajectory (start, this.m_ClosedList[index])) {
+//				naturalized_path.Add (this.m_Grid[this.m_ClosedList[index - 1]]);
+////				naturalized_path.Add (path [index - 1]);
+//				#if TESTING_NATURALIZED_PATH_ACQUISITION
+////				message += "Obstruction detected between gridbox " + start + " and " + path[index].GetBoxIndex() + ". Added gridbox " + path [index - 1].GetBoxIndex () + " to naturalized path\n";
+//				message += "Obstruction detected between gridbox " + start + " and " + this.m_ClosedList[index] + ". Added gridbox " + this.m_ClosedList[index - 1] + " to naturalized path\n";
+//				#endif
+////				start = path[index - 1].GetBoxIndex();
+//				start = this.m_ClosedList[index - 1];
+//			}
+//		}
+//
+//		naturalized_path.Add (this.m_Grid [this.m_ClosedList [this.m_ClosedList.Count - 1]]);
+//		#if TESTING_NATURALIZED_PATH_ACQUISITION
+//		Debug.Log (message);
+//		#endif
+//		return naturalized_path;
+//	}
+
 	/**A function intended to be called from the PlayerMovement class - finds and returns the naturalized path the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
 	public List<GridBox> FindPath_Naturalized(int index_from, int index_to)
 	{
@@ -371,22 +402,58 @@ public class GridClass : MonoBehaviour {
 		for (int index = 0; index < this.m_ClosedList.Count; index++) {
 			if (this.ObstructableAlongTrajectory (start, this.m_ClosedList[index])) {
 				naturalized_path.Add (this.m_Grid[this.m_ClosedList[index - 1]]);
-//				naturalized_path.Add (path [index - 1]);
+				//				naturalized_path.Add (path [index - 1]);
 				#if TESTING_NATURALIZED_PATH_ACQUISITION
-//				message += "Obstruction detected between gridbox " + start + " and " + path[index].GetBoxIndex() + ". Added gridbox " + path [index - 1].GetBoxIndex () + " to naturalized path\n";
+				//				message += "Obstruction detected between gridbox " + start + " and " + path[index].GetBoxIndex() + ". Added gridbox " + path [index - 1].GetBoxIndex () + " to naturalized path\n";
 				message += "Obstruction detected between gridbox " + start + " and " + this.m_ClosedList[index] + ". Added gridbox " + this.m_ClosedList[index - 1] + " to naturalized path\n";
 				#endif
-//				start = path[index - 1].GetBoxIndex();
+				//				start = path[index - 1].GetBoxIndex();
 				start = this.m_ClosedList[index - 1];
 			}
 		}
+
 		naturalized_path.Add (this.m_Grid [this.m_ClosedList [this.m_ClosedList.Count - 1]]);
+		//So at this point we're left with a list of gridboxes that make up the literal points we move the player such that they move
+		//around obstructables
+
+		//This next bit can probably be improved upon, but this'll do for now.
+
+//		//Test to see if we can further naturalize path
+//		List<GridBox> double_naturalized_path = new List<GridBox>();
+//
+//		int naturalization_path_index_investigated = index_from;
+//		//First deal with the naturalization from point of origin
+//		//For every point designated by the naturalized path
+//		for (int index = 1; index < naturalized_path.Count; index++) {
+//			//if there's another point further down the naturalized path's indices that you can see from the origin, then go there.
+//			if (!this.ObstructableAlongTrajectory(index_from, naturalized_path[index].GetBoxIndex()))
+//			{
+//				
+//			}
+//		}
+//
+//		for (int point = naturalization_path_index_investigated; point < naturalized_path.Count; point++) {
+//			if (naturalization_path_index_investigated != naturalized_path.Count - 1) {
+//				//For every point designated by the naturalized path
+//				for (int index = naturalization_path_index_investigated + 1; index < naturalized_path.Count; index++) {
+//					//if there's another point further down the naturalized path's indices that you can see from where you are, then go there.
+//					if (!this.ObstructableAlongTrajectory(naturalized_path[point].GetBoxIndex(), naturalized_path[index].GetBoxIndex()))
+//					{
+//						double_naturalized_path.Add (naturalized_path [index]);
+//						naturalization_path_index_investigated = index;
+//					}
+//				}
+//			}
+//		}
+		//...if you can see any of the nodes beyond your immediate next node
+		//...then remove all nodes between yourself and that node.
+
 		#if TESTING_NATURALIZED_PATH_ACQUISITION
 		Debug.Log (message);
 		#endif
 		return naturalized_path;
 	}
-	#endif
+//	#endif
 
 	/**A function intended to be called from the PlayerMovement class - finds and returns the path (without naturalization) the player will need to traverse in order to bypass an obstructable, as a List of GridBox objects*/
 	public List<GridBox> FindPath(int index_from, int index_to)

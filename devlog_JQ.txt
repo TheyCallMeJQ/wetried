@@ -71,4 +71,14 @@ So, changes to make:
         - Again, choose the one with the lowest F value and add it to the closed list, removing it from the open list in the process (NOTE: If at any point you have a situation where more than one grid box added to the open list have the lowest F value, then make sure you pick whichever grid box was most recently added to the open list).
         - Repeat until you arrive
   
-		
+05/25/2018		
+Right, so lots of stuff has happened since the last entry; we figured out Pathfinding, developing both Manhattan A* and Djikstra algorithms. I’m still not sure which is best for what we want, though for now we’re using Djikstra because the naturalization of the path looks more… natural.
+Checklist as of now:
+	- Pathfinding bugs
+		- The sprite angle leads to clipping through walls - we need to account for the sprite's height.
+        - Continuous clicking while behind a wall enables player to progressively make it through the wall. - fixed
+        - If you trigger pathfinding twice (such that the second iteration interrupt the first), stuff gets weird. - fixed
+        - Naturalization algorithm for A* Manhattan is faulty. A path can lead behind a wall but not be in the direction we want to go. Need to add a condition such that the next natural step in the path is the point furthest along the path and beyond an obstructable.
+            - Fix: return the LATEST still-visible bit before an obstructable
+	- Inventory
+	- Generalization of Movement class, with PlayerMovement, CompanionMovement, and EnemyMovement.
